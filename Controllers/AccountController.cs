@@ -1,15 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthcareCRM.Models;
+using HealthcareCRM.Services;
 
 namespace HealthcareCRM.Controllers
 {
     public class AccountController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly AuthService _authService;
 
-        public AccountController(AppDbContext context)
+        public AccountController(AppDbContext context, AuthService authService)
         {
             _context = context;
+            _authService = authService;
         }
 
         // GET: /Account/Login
@@ -27,8 +30,7 @@ namespace HealthcareCRM.Controllers
                 return View(model);
 
             // Find user by email
-            var user = _context.Users
-                .FirstOrDefault(u => u.Email == model.Email);
+            var user = _authService.GetUserByEmail(model.Email);
 
             if (user == null)
             {
@@ -36,7 +38,22 @@ namespace HealthcareCRM.Controllers
                 return View(model);
             }
 
-            // TODO: verify password hash + generate JWT (next step)
+            // Verify password
+            bool isPasswordValid = _authService.VerifyPassword(model.Password, user.PasswordHash);
+
+            if (!isPasswordValid)
+            {
+                ModelState.AddModelError("", "Invalid email or password");
+                return View(model);
+            }
+
+            // Generate JWT token and store in cookie
+            var token = _authService.GenerateJwtToken(user);
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
 
             return RedirectToAction("Index", "Home");
         }
