@@ -8,6 +8,7 @@ namespace HealthcareCRM.Models
         {
         }
 
-        // We'll add DbSet properties here as we create models (e.g. Patients, Users)
+        // Users table
+        public DbSet<User> Users { get; set; }
     }
 }
