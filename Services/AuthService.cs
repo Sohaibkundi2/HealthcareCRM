@@ -36,13 +36,41 @@ namespace HealthcareCRM.Services
             return _context.Users.FirstOrDefault(u => u.Email == email);
         }
 
+        // Register new user
+        public async Task<bool> RegisterUser(RegisterViewModel model)
+        {
+            // Check if email already exists
+            var existingUser = GetUserByEmail(model.Email);
+
+            if (existingUser != null)
+                return false;
+
+            // Create user
+            var user = new User
+            {
+                FullName = model.FullName,
+                Email = model.Email,
+                PasswordHash = HashPassword(model.Password),
+                Role = "Admin",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         // Generate JWT token
         public string GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
+                Encoding.UTF8.GetBytes(
+                    _configuration["JwtSettings:SecretKey"]!));
 
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {

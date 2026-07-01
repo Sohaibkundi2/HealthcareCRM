@@ -57,5 +57,40 @@ namespace HealthcareCRM.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        // GET: /Account/Register
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        // POST: /Account/Register
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Register user
+            bool success = await _authService.RegisterUser(model);
+
+            if (!success)
+            {
+                ModelState.AddModelError("", "Email already exists");
+                return View(model);
+            }
+
+            // Auto login after register
+            var user = _authService.GetUserByEmail(model.Email);
+            var token = _authService.GenerateJwtToken(user!);
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
