@@ -1,24 +1,39 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using HealthcareCRM.Models;
+using System.Diagnostics;
 
-namespace HealthcareCRM.Controllers;
-
-public class HomeController : Controller
+namespace HealthcareCRM.Controllers
 {
-    public IActionResult Index()
+    public class HomeController : Controller
     {
-        return View();
-    }
+        // GET: /Home/Index
+        public IActionResult Index()
+        {
+            // Check if JWT exists in request header
+            var token = Request.Cookies["jwt"] ??
+                        Request.Headers["Authorization"]
+                        .ToString().Replace("Bearer ", "");
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
+        }
     }
 }

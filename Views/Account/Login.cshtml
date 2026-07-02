@@ -17,31 +17,23 @@
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="card shadow p-4" style="width: 100%; max-width: 420px;">
-        
+
         <div class="text-center mb-4">
             <h3 class="fw-bold text-primary">HealthcareCRM</h3>
             <p class="text-muted">Sign in to your account</p>
         </div>
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger">
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <p class="mb-0">@error.ErrorMessage</p>
-                }
-            </div>
-        }
+        <div id="error-alert" class="alert alert-danger d-none"></div>
 
-        <form asp-action="Login" asp-controller="Account" method="post">
+        <form id="login-form">
             <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
-                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                <input asp-for="Email" id="email" class="form-control" placeholder="Enter your email" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Password</label>
-                <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                <input asp-for="Password" id="password" class="form-control" placeholder="Enter your password" />
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
             <div class="d-grid mb-3">
@@ -55,6 +47,38 @@
 
     </div>
 </div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorAlert = document.getElementById('error-alert');
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store JWT in localStorage
+                localStorage.setItem('jwt', data.token);
+                window.location.href = '/Home/Index';
+            } else {
+                errorAlert.classList.remove('d-none');
+                errorAlert.textContent = data.message || 'Invalid email or password';
+            }
+        } catch (err) {
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Something went wrong. Please try again.';
+        }
+    });
+</script>
 
 </body>
 </html>
