@@ -1,0 +1,220 @@
+@{
+    ViewData["Title"] = "Patients";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Patients</h2>
+        <button class="btn btn-primary" onclick="showAddForm()">+ Add Patient</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-3">
+        <input type="text" id="search-input" class="form-control" 
+               placeholder="Search patients by name..." 
+               oninput="searchPatients(this.value)" />
+    </div>
+
+    <!-- Patients Table -->
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>Date of Birth</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="patients-table">
+                    <tr>
+                        <td colspan="6" class="text-center">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="patientModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Add Patient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="form-error" class="alert alert-danger d-none"></div>
+                <input type="hidden" id="patient-id" />
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="Enter full name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter email" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Phone</label>
+                    <input type="text" id="phone" class="form-control" placeholder="Enter phone number" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Gender</label>
+                    <select id="gender" class="form-select">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Address</label>
+                    <textarea id="address" class="form-control" placeholder="Enter address"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePatient()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('jwt');
+    if (!token) window.location.href = '/Account/Login';
+
+    loadPatients();
+
+    async function loadPatients(search = '') {
+        const url = search ? `/api/patients?search=${search}` : '/api/patients';
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+        renderPatients(result.data);
+    }
+
+    function renderPatients(patients) {
+        const tbody = document.getElementById('patients-table');
+        if (!patients || patients.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No patients found</td></tr>';
+            return;
+        }
+        tbody.innerHTML = patients.map((p, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${p.fullName}</td>
+                <td>${p.phone}</td>
+                <td>${p.gender}</td>
+                <td>${new Date(p.dateOfBirth).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="showEditForm(${JSON.stringify(p).replace(/"/g, '&quot;')})">Edit</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function searchPatients(value) {
+        loadPatients(value);
+    }
+
+    function showAddForm() {
+        document.getElementById('modal-title').textContent = 'Add Patient';
+        document.getElementById('patient-id').value = '';
+        document.getElementById('fullName').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('dateOfBirth').value = '';
+        document.getElementById('gender').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('form-error').classList.add('d-none');
+        new bootstrap.Modal(document.getElementById('patientModal')).show();
+    }
+
+    function showEditForm(patient) {
+        document.getElementById('modal-title').textContent = 'Edit Patient';
+        document.getElementById('patient-id').value = patient.id;
+        document.getElementById('fullName').value = patient.fullName;
+        document.getElementById('email').value = patient.email;
+        document.getElementById('phone').value = patient.phone;
+        document.getElementById('dateOfBirth').value = patient.dateOfBirth.split('T')[0];
+        document.getElementById('gender').value = patient.gender;
+        document.getElementById('address').value = patient.address;
+        document.getElementById('form-error').classList.add('d-none');
+        new bootstrap.Modal(document.getElementById('patientModal')).show();
+    }
+
+    async function savePatient() {
+        const id = document.getElementById('patient-id').value;
+        const fullName = document.getElementById('fullName').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const dateOfBirth = document.getElementById('dateOfBirth').value;
+        const gender = document.getElementById('gender').value;
+        const errorDiv = document.getElementById('form-error');
+
+        // Frontend validation
+        if (!fullName) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Full name is required';
+            return;
+        }
+        if (!phone) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Phone is required';
+            return;
+        }
+        if (!dateOfBirth) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Date of birth is required';
+            return;
+        }
+        if (!gender) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Gender is required';
+            return;
+        }
+
+        errorDiv.classList.add('d-none');
+
+        const patient = {
+            fullName,
+            email: document.getElementById('email').value,
+            phone,
+            dateOfBirth,
+            gender,
+            address: document.getElementById('address').value,
+            createdBy: 1
+        };
+
+        const url = id ? `/api/patients/${id}` : '/api/patients';
+        const method = id ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(patient)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
+            loadPatients();
+        } else {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = result.message;
+        }
+    }
+</script>
