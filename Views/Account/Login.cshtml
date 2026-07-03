@@ -28,16 +28,17 @@
         <form id="login-form">
             <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
-                <input asp-for="Email" id="email" class="form-control" placeholder="Enter your email" />
+                <input asp-for="Email" type="email" id="email" class="form-control" placeholder="Enter your email" />
+
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Password</label>
-                <input asp-for="Password" id="password" class="form-control" placeholder="Enter your password" />
+                <input asp-for="Password" type="password" id="password" class="form-control" placeholder="Enter your password" />
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" id="login-btn" class="btn btn-primary">Login</button>
             </div>
             <div class="text-center">
                 <span class="text-muted">Don't have an account?</span>
@@ -54,9 +55,14 @@
 
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
+        const loginBtn = document.getElementById('login-btn');
         const errorAlert = document.getElementById('error-alert');
 
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Logging in...';
+
         try {
+
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -70,12 +76,18 @@
                 localStorage.setItem('jwt', data.token);
                 window.location.href = '/Home/Index';
             } else {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
                 errorAlert.classList.remove('d-none');
                 errorAlert.textContent = data.message || 'Invalid email or password';
+
             }
         } catch (err) {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
             errorAlert.classList.remove('d-none');
             errorAlert.textContent = 'Something went wrong. Please try again.';
+
         }
     });
 </script>
