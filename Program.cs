@@ -9,6 +9,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<PatientService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
