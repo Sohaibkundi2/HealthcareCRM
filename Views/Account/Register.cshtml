@@ -23,39 +23,31 @@
             <p class="text-muted">Create your account</p>
         </div>
 
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger">
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <p class="mb-0">@error.ErrorMessage</p>
-                }
-            </div>
-        }
+        <div id="error-alert" class="alert alert-danger d-none"></div>
 
-        <form asp-action="Register" asp-controller="Account" method="post">
+        <form id="register-form">
             <div class="mb-3">
                 <label class="form-label fw-semibold">Full Name</label>
-                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                <input asp-for="FullName" id="FullName" class="form-control" placeholder="Enter your full name" />
                 <span asp-validation-for="FullName" class="text-danger small"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Email</label>
-                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                <input asp-for="Email" type="email" id="Email" class="form-control" placeholder="Enter your email" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Password</label>
-                <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                <input asp-for="Password" type="password" id="Password" class="form-control" placeholder="Enter your password" />
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Confirm Password</label>
-                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
             </div>
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" id="register-btn" class="btn btn-primary">Register</button>
             </div>
             <div class="text-center">
                 <span class="text-muted">Already have an account?</span>
@@ -65,6 +57,70 @@
 
     </div>
 </div>
+
+<script>
+    document.getElementById('register-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const fullName = document.getElementById('FullName').value;
+        const email = document.getElementById('Email').value;
+        const password = document.getElementById('Password').value;
+        const confirmPassword = document.getElementById('ConfirmPassword').value;
+        const errorAlert = document.getElementById('error-alert');
+        const registerBtn = document.getElementById('register-btn');
+
+        // Frontend validation
+        if (!fullName) {
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Full name is required';
+            return;
+        }
+        if (!email) {
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Email is required';
+            return;
+        }
+        if (!password || password.length < 6) {
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Password must be at least 6 characters';
+            return;
+        }
+        if (password !== confirmPassword) {
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Passwords do not match';
+            return;
+        }
+
+        errorAlert.classList.add('d-none');
+        registerBtn.disabled = true;
+        registerBtn.textContent = 'Creating account...';
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullName, email, password, confirmPassword })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('jwt', data.token);
+                window.location.replace('/Home/Index');
+            } else {
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                errorAlert.classList.remove('d-none');
+                errorAlert.textContent = data.message || 'Registration failed';
+            }
+        } catch (err) {
+            registerBtn.disabled = false;
+            registerBtn.textContent = 'Register';
+            errorAlert.classList.remove('d-none');
+            errorAlert.textContent = 'Something went wrong. Please try again.';
+        }
+    });
+</script>
 
 </body>
 </html>

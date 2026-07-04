@@ -9,16 +9,6 @@ namespace HealthcareCRM.Controllers
         // GET: /Home/Index
         public IActionResult Index()
         {
-            // Check if JWT exists in request header
-            var token = Request.Cookies["jwt"] ??
-                        Request.Headers["Authorization"]
-                        .ToString().Replace("Bearer ", "");
-
-            if (string.IsNullOrEmpty(token))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
             return View();
         }
 
