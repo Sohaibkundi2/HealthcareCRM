@@ -124,7 +124,7 @@
     loadPatients();
 
     async function loadPatients() {
-        const params = new URLSearchParams({ pageNumber: currentPage, pageSize: 10 });
+        const params = new URLSearchParams({ pageNumber: currentPage, pageSize: 20 });
         if (currentSearch) params.set('search', currentSearch);
 
         const response = await fetch(`/api/patients?${params.toString()}`, {
