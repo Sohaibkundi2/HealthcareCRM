@@ -116,6 +116,8 @@
     const token = localStorage.getItem('jwt');
     if (!token) window.location.href = '/Account/Login';
 
+    const PAGE_SIZE = 20;
+
     let currentSearch = '';
     let currentPage = 1;
     let deleteTargetId = null;
@@ -124,7 +126,7 @@
     loadPatients();
 
     async function loadPatients() {
-        const params = new URLSearchParams({ pageNumber: currentPage, pageSize: 20 });
+        const params = new URLSearchParams({ pageNumber: currentPage, pageSize: PAGE_SIZE });
         if (currentSearch) params.set('search', currentSearch);
 
         const response = await fetch(`/api/patients?${params.toString()}`, {
@@ -143,7 +145,7 @@
         }
         tbody.innerHTML = patients.map((p, i) => `
             <tr>
-                <td>${(currentPage - 1) * 10 + i + 1}</td>
+                <td>${(currentPage - 1) * PAGE_SIZE + i + 1}</td>
                 <td>${p.fullName}</td>
                 <td>${p.phone}</td>
                 <td>${p.gender}</td>
@@ -305,7 +307,6 @@
 
         if (response.ok) {
             deleteTargetId = null;
-            // If we deleted the last item on this page and it's not page 1, go back a page
             const tbody = document.getElementById('patients-table');
             if (tbody.children.length === 1 && currentPage > 1) {
                 currentPage--;
