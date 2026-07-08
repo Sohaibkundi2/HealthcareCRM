@@ -69,46 +69,94 @@
         </div>
     </div>
 </div>
-
 <script>
     const token = localStorage.getItem('jwt');
-    if (!token) window.location.href = '/Account/Login';
+
+    if (!token) {
+        window.location.href = '/Account/Login';
+    }
 
     const patientId = @Model;
     let patientData = null;
 
     async function loadPatient() {
-        const response = await fetch(`/api/patients/${patientId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        try {
+            const response = await fetch(`/api/patients/${patientId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
-        const result = await response.json();
+            // Handle expired/invalid token
+            if (response.status === 401) {
+                localStorage.removeItem('jwt');
+                window.location.href = '/Account/Login';
+                return;
+            }
 
-        if (response.ok) {
+            const result = await response.json();
+
+            if (!response.ok) {
+                document.getElementById('loading').innerHTML =
+                    '<p class="text-danger">Patient not found.</p>';
+                return;
+            }
+
             const p = result.data;
             patientData = p;
 
-            // Avatar initials
-            const initials = p.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-            document.getElementById('avatar-initials').textContent = initials;
+            // Avatar initials (safe)
+            const initials = (p.fullName || '')
+                .trim()
+                .split(/\s+/)
+                .map(name => name[0])
+                .join('')
+                .toUpperCase();
+
+            document.getElementById('avatar-initials').textContent = initials || '?';
 
             document.getElementById('detail-fullName').textContent = p.fullName;
             document.getElementById('detail-gender').textContent = p.gender;
             document.getElementById('detail-email').textContent = p.email || 'No email provided';
             document.getElementById('detail-phone').textContent = p.phone;
-            document.getElementById('detail-dob').textContent = new Date(p.dateOfBirth).toLocaleDateString();
-            document.getElementById('detail-address').textContent = p.address || '—';
-            document.getElementById('detail-createdAt').textContent = new Date(p.createdAt).toLocaleDateString();
+
+            document.getElementById('detail-dob').textContent =
+                new Date(p.dateOfBirth).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            document.getElementById('detail-address').textContent =
+                p.address || '—';
+
+            document.getElementById('detail-createdAt').textContent =
+                new Date(p.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
 
             document.getElementById('loading').classList.add('d-none');
             document.getElementById('patient-detail').classList.remove('d-none');
-        } else {
-            document.getElementById('loading').innerHTML = '<p class="text-danger">Patient not found.</p>';
+        }
+        catch (error) {
+            console.error('Failed to load patient:', error);
+
+            document.getElementById('loading').innerHTML = `
+                <div class="text-center">
+                    <p class="text-danger mb-2">Unable to load patient.</p>
+                    <button class="btn btn-primary btn-sm" onclick="loadPatient()">
+                        Try Again
+                    </button>
+                </div>
+            `;
         }
     }
 
     function goToEdit() {
-        // Store patient data and redirect to patients page with edit trigger
+        if (!patientData) return;
+
         sessionStorage.setItem('editPatient', JSON.stringify(patientData));
         window.location.href = '/Patients';
     }
