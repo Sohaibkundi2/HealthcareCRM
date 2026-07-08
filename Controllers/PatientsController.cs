@@ -9,5 +9,10 @@ namespace HealthcareCRM.Controllers
         {
             return View();
         }
+        // GET: /Patients/Detail/{id}
+        public IActionResult Detail(int id)
+        {
+            return View(model: id);
+        }
     }
 }

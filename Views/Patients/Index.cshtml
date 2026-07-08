@@ -151,6 +151,7 @@
                 <td>${p.gender}</td>
                 <td>${new Date(p.dateOfBirth).toLocaleDateString()}</td>
                 <td>
+                    <a href="/Patients/Detail/${p.id}" class="btn btn-sm btn-info text-white">View</a>
                     <button class="btn btn-sm btn-warning" onclick="showEditForm(${JSON.stringify(p).replace(/"/g, '&quot;')})">Edit</button>
                     <button class="btn btn-sm btn-danger" onclick="showDeleteConfirm(${p.id}, '${p.fullName.replace(/'/g, "\\'")}')">Delete</button>
                 </td>
