@@ -1,0 +1,165 @@
+@model int
+
+@{
+    ViewData["Title"] = "Patient Detail";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Patient Detail</h2>
+        <a href="/Patients" class="btn btn-secondary">← Back to Patients</a>
+    </div>
+
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Loading patient...</p>
+    </div>
+
+    <div id="patient-detail" class="d-none">
+        <!-- Profile Header Card -->
+        <div class="card shadow mb-4">
+            <div class="card-body d-flex align-items-center gap-4 p-4">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                     style="width:80px; height:80px; font-size:2rem;" id="avatar-initials">
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1" id="detail-fullName"></h3>
+                    <span class="badge bg-success" id="detail-gender"></span>
+                    <p class="text-muted mb-0 mt-1" id="detail-email"></p>
+                </div>
+                <div class="ms-auto">
+                    <button class="btn btn-warning" onclick="goToEdit()">✏️ Edit Patient</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Card -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white fw-semibold">
+                Patient Information
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">📞 Phone</small>
+                            <strong id="detail-phone"></strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">🎂 Date of Birth</small>
+                            <strong id="detail-dob"></strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">📍 Address</small>
+                            <strong id="detail-address"></strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">📅 Registered On</small>
+                            <strong id="detail-createdAt"></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const token = localStorage.getItem('jwt');
+
+    if (!token) {
+        window.location.href = '/Account/Login';
+    }
+
+    const patientId = @Model;
+    let patientData = null;
+
+    async function loadPatient() {
+        try {
+            const response = await fetch(`/api/patients/${patientId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            // Handle expired/invalid token
+            if (response.status === 401) {
+                localStorage.removeItem('jwt');
+                window.location.href = '/Account/Login';
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                document.getElementById('loading').innerHTML =
+                    '<p class="text-danger">Patient not found.</p>';
+                return;
+            }
+
+            const p = result.data;
+            patientData = p;
+
+            // Avatar initials (safe)
+            const initials = (p.fullName || '')
+                .trim()
+                .split(/\s+/)
+                .map(name => name[0])
+                .join('')
+                .toUpperCase();
+
+            document.getElementById('avatar-initials').textContent = initials || '?';
+
+            document.getElementById('detail-fullName').textContent = p.fullName;
+            document.getElementById('detail-gender').textContent = p.gender;
+            document.getElementById('detail-email').textContent = p.email || 'No email provided';
+            document.getElementById('detail-phone').textContent = p.phone;
+
+            document.getElementById('detail-dob').textContent =
+                new Date(p.dateOfBirth).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            document.getElementById('detail-address').textContent =
+                p.address || '—';
+
+            document.getElementById('detail-createdAt').textContent =
+                new Date(p.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            document.getElementById('loading').classList.add('d-none');
+            document.getElementById('patient-detail').classList.remove('d-none');
+        }
+        catch (error) {
+            console.error('Failed to load patient:', error);
+
+            document.getElementById('loading').innerHTML = `
+                <div class="text-center">
+                    <p class="text-danger mb-2">Unable to load patient.</p>
+                    <button class="btn btn-primary btn-sm" onclick="loadPatient()">
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    function goToEdit() {
+        if (!patientData) return;
+
+        sessionStorage.setItem('editPatient', JSON.stringify(patientData));
+        window.location.href = '/Patients';
+    }
+
+    loadPatient();
+</script>
