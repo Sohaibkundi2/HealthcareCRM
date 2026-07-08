@@ -12,21 +12,46 @@ namespace HealthcareCRM.Services
             _context = context;
         }
 
-        // Get all patients
-        public async Task<List<Patient>> GetAllPatients()
+        // Get all patients (paged)
+        public async Task<PagedResult<Patient>> GetAllPatients(int pageNumber, int pageSize)
         {
-            return await _context.Patients
-                .OrderByDescending(p => p.CreatedAt)
+            var query = _context.Patients.OrderByDescending(p => p.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedResult<Patient>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
-        // Search patients by name
-        public async Task<List<Patient>> SearchPatients(string search)
+        // Search patients by name (paged)
+        public async Task<PagedResult<Patient>> SearchPatients(string search, int pageNumber, int pageSize)
         {
-            return await _context.Patients
+            var query = _context.Patients
                 .Where(p => p.FullName.Contains(search))
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedResult<Patient>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
 
         // Get patient by id
@@ -57,6 +82,17 @@ namespace HealthcareCRM.Services
             patient.Gender = updated.Gender;
             patient.Address = updated.Address;
 
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        // Delete patient 
+        public async Task<bool> DeletePatient(int id)
+        {
+            var patient = await _context.Patients.FindAsync(id);
+            if (patient == null) return false;
+
+            _context.Patients.Remove(patient);
             await _context.SaveChangesAsync();
             return true;
         }
