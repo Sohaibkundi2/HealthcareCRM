@@ -54,8 +54,20 @@ namespace HealthcareCRM.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Patient patient)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { success = false, message = "Invalid input" });
+            if (string.IsNullOrWhiteSpace(patient.FullName))
+                return BadRequest(new { success = false, message = "Full name is required" });
+
+            if (string.IsNullOrWhiteSpace(patient.Phone))
+                return BadRequest(new { success = false, message = "Phone is required" });
+
+            if (patient.DateOfBirth == default)
+                return BadRequest(new { success = false, message = "Date of birth is required" });
+
+            if (string.IsNullOrWhiteSpace(patient.Gender))
+                return BadRequest(new { success = false, message = "Gender is required" });
+
+            if (patient.DateOfBirth > DateTime.UtcNow)
+                return BadRequest(new { success = false, message = "Date of birth cannot be in the future" });
 
             var created = await _patientService.AddPatient(patient);
             return CreatedAtAction(nameof(GetById), new { id = created.Id },
@@ -66,8 +78,20 @@ namespace HealthcareCRM.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Patient patient)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { success = false, message = "Invalid input" });
+            if (string.IsNullOrWhiteSpace(patient.FullName))
+                return BadRequest(new { success = false, message = "Full name is required" });
+
+            if (string.IsNullOrWhiteSpace(patient.Phone))
+                return BadRequest(new { success = false, message = "Phone is required" });
+
+            if (patient.DateOfBirth == default)
+                return BadRequest(new { success = false, message = "Date of birth is required" });
+
+            if (string.IsNullOrWhiteSpace(patient.Gender))
+                return BadRequest(new { success = false, message = "Gender is required" });
+
+            if (patient.DateOfBirth > DateTime.UtcNow)
+                return BadRequest(new { success = false, message = "Date of birth cannot be in the future" });
 
             var success = await _patientService.UpdatePatient(id, patient);
 

@@ -32,11 +32,15 @@ namespace HealthcareCRM.Services
             };
         }
 
-        // Search patients by name (paged)
+        // Search patients by name, phone or date of birth
         public async Task<PagedResult<Patient>> SearchPatients(string search, int pageNumber, int pageSize)
         {
+            var lowerSearch = search.ToLower();
             var query = _context.Patients
-                .Where(p => p.FullName.Contains(search))
+                .Where(p =>
+                    p.FullName.ToLower().Contains(lowerSearch) ||
+                    p.Phone.Contains(search) ||
+                    p.DateOfBirth.ToString().Contains(search))
                 .OrderByDescending(p => p.CreatedAt);
 
             var totalCount = await query.CountAsync();
@@ -50,7 +54,7 @@ namespace HealthcareCRM.Services
                 Items = items,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
-                PageSize = pageSize
+                PageSize = pageSize,
             };
         }
 
