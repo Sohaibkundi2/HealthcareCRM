@@ -39,10 +39,21 @@
     const token = localStorage.getItem('jwt');
     if (!token) window.location.href = '/Account/Login';
 
-    async function loadDoctors() {
+    function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+}
+
+async function loadDoctors() {
+    try {
         const response = await fetch('/api/doctors', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
 
         const result = await response.json();
 
@@ -57,9 +68,9 @@
         document.getElementById('doctors-table').innerHTML = result.data.map((d, i) => `
             <tr>
                 <td>${i + 1}</td>
-                <td>${d.name}</td>
-                <td>${d.specialization}</td>
-                <td>${d.phone}</td>
+                <td>${escapeHtml(d.name)}</td>
+                <td>${escapeHtml(d.specialization)}</td>
+                <td>${escapeHtml(d.phone)}</td>
                 <td>
                     <span class="badge ${d.isActive ? 'bg-success' : 'bg-secondary'}">
                         ${d.isActive ? 'Active' : 'Inactive'}
@@ -67,7 +78,12 @@
                 </td>
             </tr>
         `).join('');
+
+    } catch (err) {
+        document.getElementById('loading').innerHTML = 
+            '<p class="text-danger">Failed to load doctors. Please try again.</p>';
     }
+}
 
     loadDoctors();
 </script>
