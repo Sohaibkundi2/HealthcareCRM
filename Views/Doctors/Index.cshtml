@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Doctors";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Doctors</h2>
+        <span class="badge bg-info text-white fs-6">Read Only — Full CRUD coming Week 3</span>
+    </div>
+
+    <div id="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Loading doctors...</p>
+    </div>
+
+    <div class="card shadow d-none" id="doctors-card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="doctors-table">
+                </tbody>
+            </table>
+            <div id="empty-state" class="text-center text-muted d-none py-4">
+                No doctors found.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('jwt');
+    if (!token) window.location.href = '/Account/Login';
+
+    function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+}
+
+async function loadDoctors() {
+    try {
+        const response = await fetch('/api/doctors', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('doctors-card').classList.remove('d-none');
+
+        if (!result.data || result.data.length === 0) {
+            document.getElementById('empty-state').classList.remove('d-none');
+            return;
+        }
+
+        document.getElementById('doctors-table').innerHTML = result.data.map((d, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${escapeHtml(d.name)}</td>
+                <td>${escapeHtml(d.specialization)}</td>
+                <td>${escapeHtml(d.phone)}</td>
+                <td>
+                    <span class="badge ${d.isActive ? 'bg-success' : 'bg-secondary'}">
+                        ${d.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+
+    } catch (err) {
+        document.getElementById('loading').innerHTML = 
+            '<p class="text-danger">Failed to load doctors. Please try again.</p>';
+    }
+}
+
+    loadDoctors();
+</script>
