@@ -5,7 +5,13 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Doctors</h2>
-        <span class="badge bg-info text-white fs-6">Read Only — Full CRUD coming Week 3</span>
+        <div class="d-flex gap-2">
+            <div class="form-check form-switch mt-2">
+                <input class="form-check-input" type="checkbox" id="show-inactive" onchange="toggleInactive(this.checked)">
+                <label class="form-check-label" for="show-inactive">Show Inactive</label>
+            </div>
+            <button class="btn btn-primary" onclick="showAddForm()">+ Add Doctor</button>
+        </div>
     </div>
 
     <div id="loading" class="text-center py-4">
@@ -23,13 +29,64 @@
                         <th>Specialization</th>
                         <th>Phone</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="doctors-table">
-                </tbody>
+                <tbody id="doctors-table"></tbody>
             </table>
             <div id="empty-state" class="text-center text-muted d-none py-4">
                 No doctors found.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="doctorModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Add Doctor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="form-error" class="alert alert-danger d-none"></div>
+                <input type="hidden" id="doctor-id" />
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Enter doctor name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Specialization</label>
+                    <input type="text" id="specialization" class="form-control" placeholder="e.g. Cardiologist" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Phone</label>
+                    <input type="text" id="phone" class="form-control" placeholder="Enter phone number" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="save-btn" class="btn btn-primary" onclick="saveDoctor()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deactivate Confirm Modal -->
+<div class="modal fade" id="deactivateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deactivate-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="deactivate-body">
+                Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="deactivate-btn" class="btn btn-warning" onclick="confirmToggle()">Confirm</button>
             </div>
         </div>
     </div>
@@ -39,21 +96,25 @@
     const token = localStorage.getItem('jwt');
     if (!token) window.location.href = '/Account/Login';
 
+    let toggleTargetId = null;
+    let toggleIsActive = false;
+    let showInactive = false;
+
     function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.appendChild(document.createTextNode(text));
-    return div.innerHTML;
-}
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text || ''));
+        return div.innerHTML;
+    }
+
 
 async function loadDoctors() {
     try {
-        const response = await fetch('/api/doctors', {
+        const url = showInactive ? '/api/doctors?includeInactive=true' : '/api/doctors';
+        const response = await fetch(url, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
+        if (!response.ok) throw new Error('Failed to load');
 
         const result = await response.json();
 
@@ -62,9 +123,11 @@ async function loadDoctors() {
 
         if (!result.data || result.data.length === 0) {
             document.getElementById('empty-state').classList.remove('d-none');
+            document.getElementById('doctors-table').innerHTML = '';
             return;
         }
 
+        document.getElementById('empty-state').classList.add('d-none');
         document.getElementById('doctors-table').innerHTML = result.data.map((d, i) => `
             <tr>
                 <td>${i + 1}</td>
@@ -76,14 +139,141 @@ async function loadDoctors() {
                         ${d.isActive ? 'Active' : 'Inactive'}
                     </span>
                 </td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="showEditForm(${JSON.stringify(d).replace(/"/g, '&quot;')})">Edit</button>
+                    <button class="btn btn-sm ${d.isActive ? 'btn-danger' : 'btn-success'}" 
+                        onclick="showToggleConfirm(${d.id}, ${d.isActive}, '${escapeHtml(d.name)}')">
+                        ${d.isActive ? 'Deactivate' : 'Reactivate'}
+                    </button>
+                </td>
             </tr>
         `).join('');
 
     } catch (err) {
-        document.getElementById('loading').innerHTML = 
+        document.getElementById('loading').innerHTML =
             '<p class="text-danger">Failed to load doctors. Please try again.</p>';
     }
 }
+
+function toggleInactive(checked) {
+    showInactive = checked;
+    loadDoctors();
+}
+
+    function showAddForm() {
+        document.getElementById('modal-title').textContent = 'Add Doctor';
+        document.getElementById('doctor-id').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('specialization').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('form-error').classList.add('d-none');
+        new bootstrap.Modal(document.getElementById('doctorModal')).show();
+    }
+
+    function showEditForm(doctor) {
+        document.getElementById('modal-title').textContent = 'Edit Doctor';
+        document.getElementById('doctor-id').value = doctor.id;
+        document.getElementById('name').value = doctor.name;
+        document.getElementById('specialization').value = doctor.specialization;
+        document.getElementById('phone').value = doctor.phone;
+        document.getElementById('form-error').classList.add('d-none');
+        new bootstrap.Modal(document.getElementById('doctorModal')).show();
+    }
+
+    async function saveDoctor() {
+        const id = document.getElementById('doctor-id').value;
+        const name = document.getElementById('name').value.trim();
+        const specialization = document.getElementById('specialization').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const errorDiv = document.getElementById('form-error');
+        const saveBtn = document.getElementById('save-btn');
+
+        if (!name) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Name is required';
+            return;
+        }
+        if (!specialization) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Specialization is required';
+            return;
+        }
+        if (!phone) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Phone is required';
+            return;
+        }
+
+        errorDiv.classList.add('d-none');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        try {
+            const url = id ? `/api/doctors/${id}` : '/api/doctors';
+            const method = id ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, specialization, phone })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('doctorModal')).hide();
+                loadDoctors();
+            } else {
+                errorDiv.classList.remove('d-none');
+                errorDiv.textContent = result.message;
+            }
+        } catch (err) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Something went wrong. Please try again.';
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
+        }
+    }
+
+    function showToggleConfirm(id, isActive, name) {
+        toggleTargetId = id;
+        toggleIsActive = isActive;
+        document.getElementById('deactivate-title').textContent = isActive ? 'Deactivate Doctor' : 'Reactivate Doctor';
+        document.getElementById('deactivate-body').textContent = isActive
+            ? `Are you sure you want to deactivate ${name}? They won't appear in appointment bookings.`
+            : `Are you sure you want to reactivate ${name}?`;
+        document.getElementById('deactivate-btn').className = isActive ? 'btn btn-danger' : 'btn btn-success';
+        document.getElementById('deactivate-btn').textContent = isActive ? 'Deactivate' : 'Reactivate';
+        new bootstrap.Modal(document.getElementById('deactivateModal')).show();
+    }
+
+    async function confirmToggle() {
+        if (!toggleTargetId) return;
+
+        const url = `/api/doctors/${toggleTargetId}/${toggleIsActive ? 'deactivate' : 'reactivate'}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('deactivateModal')).hide();
+
+            if (response.ok) {
+                toggleTargetId = null;
+                loadDoctors();
+            } else {
+                alert('Failed to update doctor status');
+            }
+        } catch (err) {
+            alert('Something went wrong. Please try again.');
+        }
+    }
 
     loadDoctors();
 </script>
