@@ -142,7 +142,7 @@ async function loadDoctors() {
                 <td>
                     <button class="btn btn-sm btn-warning" onclick="showEditForm(${JSON.stringify(d).replace(/"/g, '&quot;')})">Edit</button>
                     <button class="btn btn-sm ${d.isActive ? 'btn-danger' : 'btn-success'}" 
-                        onclick="showToggleConfirm(${d.id}, ${d.isActive}, '${escapeHtml(d.name)}')">
+                        onclick="showToggleConfirm(${d.id}, ${d.isActive}, ${JSON.stringify(d.name)})">
                         ${d.isActive ? 'Deactivate' : 'Reactivate'}
                     </button>
                 </td>
