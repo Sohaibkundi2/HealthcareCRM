@@ -1,0 +1,25 @@
+{
+  "name": "git",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sohaibkundi2/HealthcareCRM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sohaibkundi2/HealthcareCRM/issues"
+  },
+  "homepage": "https://github.com/Sohaibkundi2/HealthcareCRM#readme",
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "jsdom": "^26.1.0"
+  }
+}
