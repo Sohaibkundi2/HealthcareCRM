@@ -1,0 +1,228 @@
+@{
+    ViewData["Title"] = "Appointments";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Appointments</h2>
+        <a href="/Appointments/Book" class="btn btn-primary">+ Book Appointment</a>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="mb-3 d-flex gap-2">
+        <button class="btn btn-outline-secondary active" onclick="filterByStatus('')">All</button>
+        <button class="btn btn-outline-warning" onclick="filterByStatus('Pending')">Pending</button>
+        <button class="btn btn-outline-success" onclick="filterByStatus('Confirmed')">Confirmed</button>
+        <button class="btn btn-outline-danger" onclick="filterByStatus('Cancelled')">Cancelled</button>
+    </div>
+
+    <div id="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Loading appointments...</p>
+    </div>
+
+    <div class="card shadow d-none" id="appointments-card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointments-table"></tbody>
+            </table>
+            <div id="empty-state" class="text-center text-muted d-none py-4">
+                No appointments found.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="status-appointment-id" />
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Select Status</label>
+                    <select id="status-select" class="form-select">
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmStatusUpdate()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Confirm Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Keep It</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('jwt');
+    if (!token) window.location.href = '/Account/Login';
+
+    let currentStatus = '';
+    let cancelTargetId = null;
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text || ''));
+        return div.innerHTML;
+    }
+
+    function getStatusBadge(status) {
+        const colors = {
+            'Pending': 'bg-warning text-dark',
+            'Confirmed': 'bg-success',
+            'Cancelled': 'bg-danger'
+        };
+        return `<span class="badge ${colors[status] || 'bg-secondary'}">${status}</span>`;
+    }
+
+    async function loadAppointments() {
+        try {
+            const url = currentStatus
+                ? `/api/appointments?status=${currentStatus}`
+                : '/api/appointments';
+
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to load');
+
+            const result = await response.json();
+
+            document.getElementById('loading').classList.add('d-none');
+            document.getElementById('appointments-card').classList.remove('d-none');
+
+            if (!result.data || result.data.length === 0) {
+                document.getElementById('empty-state').classList.remove('d-none');
+                document.getElementById('appointments-table').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('empty-state').classList.add('d-none');
+            document.getElementById('appointments-table').innerHTML = result.data.map((a, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHtml(a.patient?.fullName || '—')}</td>
+                    <td>${escapeHtml(a.doctor?.name || '—')}</td>
+                    <td>${new Date(a.appointmentDate).toLocaleString()}</td>
+                    <td>${getStatusBadge(a.status)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white" onclick="showStatusModal(${a.id}, ${JSON.stringify(a.status)})">Update Status</button>
+                        ${a.status !== 'Cancelled' ? `<button class="btn btn-sm btn-danger" onclick="showCancelConfirm(${a.id})">Cancel</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (err) {
+            document.getElementById('loading').innerHTML =
+                '<p class="text-danger">Failed to load appointments. Please try again.</p>';
+        }
+    }
+
+    function filterByStatus(status) {
+        currentStatus = status;
+        document.querySelectorAll('.btn-outline-secondary, .btn-outline-warning, .btn-outline-success, .btn-outline-danger')
+            .forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('loading').classList.remove('d-none');
+        document.getElementById('appointments-card').classList.add('d-none');
+        loadAppointments();
+    }
+
+    function showStatusModal(id, currentStatus) {
+        document.getElementById('status-appointment-id').value = id;
+        document.getElementById('status-select').value = currentStatus;
+        new bootstrap.Modal(document.getElementById('statusModal')).show();
+    }
+
+    async function confirmStatusUpdate() {
+        const id = document.getElementById('status-appointment-id').value;
+        const status = document.getElementById('status-select').value;
+
+        try {
+            const response = await fetch(`/api/appointments/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('statusModal')).hide();
+
+            if (response.ok) {
+                loadAppointments();
+            } else {
+                alert('Failed to update status');
+            }
+        } catch (err) {
+            alert('Something went wrong. Please try again.');
+        }
+    }
+
+    function showCancelConfirm(id) {
+        cancelTargetId = id;
+        new bootstrap.Modal(document.getElementById('cancelModal')).show();
+    }
+
+    async function confirmCancel() {
+        if (!cancelTargetId) return;
+
+        try {
+            const response = await fetch(`/api/appointments/${cancelTargetId}/cancel`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
+
+            if (response.ok) {
+                cancelTargetId = null;
+                loadAppointments();
+            } else {
+                alert('Failed to cancel appointment');
+            }
+        } catch (err) {
+            alert('Something went wrong. Please try again.');
+        }
+    }
+
+    loadAppointments();
+</script>

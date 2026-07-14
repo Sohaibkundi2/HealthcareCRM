@@ -1,0 +1,156 @@
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Book Appointment</h2>
+        <a href="/Appointments" class="btn btn-secondary">← Back to Appointments</a>
+    </div>
+
+    <div class="card shadow" style="max-width: 600px;">
+        <div class="card-body p-4">
+            <div id="form-error" class="alert alert-danger d-none"></div>
+            <div id="form-success" class="alert alert-success d-none"></div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Patient</label>
+                <select id="patientId" class="form-select">
+                    <option value="">Select patient...</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Doctor</label>
+                <select id="doctorId" class="form-select">
+                    <option value="">Select doctor...</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Appointment Date & Time</label>
+                <input type="datetime-local" id="appointmentDate" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Notes (optional)</label>
+                <textarea id="notes" class="form-control" rows="3" placeholder="Any notes..."></textarea>
+            </div>
+            <div class="d-grid">
+                <button id="book-btn" class="btn btn-primary" onclick="bookAppointment()">Book Appointment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('jwt');
+    if (!token) window.location.href = '/Account/Login';
+
+    // Load patients and doctors on page load
+    async function loadDropdowns() {
+        try {
+            // Load patients
+            const pRes = await fetch('/api/patients?pageSize=1000', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const pData = await pRes.json();
+            const patientSelect = document.getElementById('patientId');
+            pData.data.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.fullName;
+                patientSelect.appendChild(option);
+            });
+
+            // Load doctors
+            const dRes = await fetch('/api/doctors', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const dData = await dRes.json();
+            const doctorSelect = document.getElementById('doctorId');
+            dData.data.forEach(d => {
+                const option = document.createElement('option');
+                option.value = d.id;
+                option.textContent = `${d.name} — ${d.specialization}`;
+                doctorSelect.appendChild(option);
+            });
+
+        } catch (err) {
+            document.getElementById('form-error').classList.remove('d-none');
+            document.getElementById('form-error').textContent = 'Failed to load patients and doctors.';
+        }
+    }
+
+    async function bookAppointment() {
+        const patientId = document.getElementById('patientId').value;
+        const doctorId = document.getElementById('doctorId').value;
+        const appointmentDate = document.getElementById('appointmentDate').value;
+        const notes = document.getElementById('notes').value;
+        const errorDiv = document.getElementById('form-error');
+        const successDiv = document.getElementById('form-success');
+        const bookBtn = document.getElementById('book-btn');
+
+        // Frontend validation
+        if (!patientId) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Please select a patient';
+            return;
+        }
+        if (!doctorId) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Please select a doctor';
+            return;
+        }
+        if (!appointmentDate) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Please select appointment date and time';
+            return;
+        }
+
+        // Check date is not in past
+        if (new Date(appointmentDate) < new Date()) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Appointment date cannot be in the past';
+            return;
+        }
+
+        errorDiv.classList.add('d-none');
+        bookBtn.disabled = true;
+        bookBtn.textContent = 'Booking...';
+
+        try {
+            const response = await fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    patientId: parseInt(patientId),
+                    doctorId: parseInt(doctorId),
+                    appointmentDate,
+                    notes
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                successDiv.classList.remove('d-none');
+                successDiv.textContent = 'Appointment booked successfully!';
+                setTimeout(() => {
+                    window.location.href = '/Appointments';
+                }, 1500);
+            } else {
+                errorDiv.classList.remove('d-none');
+                errorDiv.textContent = result.message;
+            }
+        } catch (err) {
+            errorDiv.classList.remove('d-none');
+            errorDiv.textContent = 'Something went wrong. Please try again.';
+        } finally {
+            bookBtn.disabled = false;
+            bookBtn.textContent = 'Book Appointment';
+        }
+    }
+
+    loadDropdowns();
+</script>
