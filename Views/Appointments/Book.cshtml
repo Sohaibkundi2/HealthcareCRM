@@ -2,41 +2,137 @@
     ViewData["Title"] = "Book Appointment";
 }
 
-<div class="container mt-4">
+<style>
+    body { background: #0a0a0a !important; color: white; }
+
+    .page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+
+    .btn-back {
+        background: transparent;
+        border: 1px solid #222;
+        color: #aaa;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover { border-color: #00ff88; color: #00ff88; }
+
+    .book-card {
+        background: #111;
+        border: 1px solid #1a1a1a;
+        border-radius: 14px;
+        padding: 2rem;
+        max-width: 580px;
+    }
+
+    .dark-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .dark-input, .dark-select, .dark-textarea {
+        background: #0a0a0a !important;
+        border: 1px solid #262626 !important;
+        color: white !important;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+        font-family: inherit;
+    }
+
+    .dark-input::placeholder,
+    .dark-textarea::placeholder { color: #444; }
+
+    .dark-input:focus,
+    .dark-select:focus,
+    .dark-textarea:focus {
+        outline: none;
+        border-color: #00ff88 !important;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1) !important;
+    }
+
+    .dark-select option { background: #111; }
+
+    .dark-textarea { resize: vertical; min-height: 90px; }
+
+    .btn-submit {
+        width: 100%;
+        background: #00ff88;
+        color: #0a0a0a;
+        border: none;
+        padding: 0.85rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.15s;
+        margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .alert-error {
+        background: #2a1212;
+        border: 1px solid #4a1f1f;
+        color: #ff8f8f;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .alert-success {
+        background: #0d1f15;
+        border: 1px solid #1a3d26;
+        color: #00ff88;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+    }
+</style>
+
+<div class="container py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Book Appointment</h2>
-        <a href="/Appointments" class="btn btn-secondary">← Back to Appointments</a>
+        <h2 class="page-title mb-0">Book Appointment</h2>
+        <a href="/Appointments" class="btn-back">← Back</a>
     </div>
 
-    <div class="card shadow" style="max-width: 600px;">
-        <div class="card-body p-4">
-            <div id="form-error" class="alert alert-danger d-none"></div>
-            <div id="form-success" class="alert alert-success d-none"></div>
+    <div class="book-card">
+        <div id="form-error" class="alert-error d-none"></div>
+        <div id="form-success" class="alert-success d-none"></div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Patient</label>
-                <select id="patientId" class="form-select">
-                    <option value="">Select patient...</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Doctor</label>
-                <select id="doctorId" class="form-select">
-                    <option value="">Select doctor...</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Appointment Date & Time</label>
-                <input type="datetime-local" id="appointmentDate" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Notes (optional)</label>
-                <textarea id="notes" class="form-control" rows="3" placeholder="Any notes..."></textarea>
-            </div>
-            <div class="d-grid">
-                <button id="book-btn" class="btn btn-primary" onclick="bookAppointment()">Book Appointment</button>
-            </div>
+        <div class="mb-3">
+            <label class="dark-label">Patient</label>
+            <select id="patientId" class="dark-select">
+                <option value="">Select patient...</option>
+            </select>
         </div>
+        <div class="mb-3">
+            <label class="dark-label">Doctor</label>
+            <select id="doctorId" class="dark-select">
+                <option value="">Select doctor...</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="dark-label">Appointment Date & Time</label>
+            <input type="datetime-local" id="appointmentDate" class="dark-input" />
+        </div>
+        <div class="mb-3">
+            <label class="dark-label">Notes (optional)</label>
+            <textarea id="notes" class="dark-textarea" placeholder="Any notes..."></textarea>
+        </div>
+        <button id="book-btn" class="btn-submit" onclick="bookAppointment()">Book Appointment</button>
     </div>
 </div>
 
@@ -44,10 +140,8 @@
     const token = localStorage.getItem('jwt');
     if (!token) window.location.href = '/Account/Login';
 
-    // Load patients and doctors on page load
     async function loadDropdowns() {
         try {
-            // Load patients
             const pRes = await fetch('/api/patients?pageSize=1000', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -60,7 +154,6 @@
                 patientSelect.appendChild(option);
             });
 
-            // Load doctors
             const dRes = await fetch('/api/doctors', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -88,31 +181,14 @@
         const successDiv = document.getElementById('form-success');
         const bookBtn = document.getElementById('book-btn');
 
-        // Frontend validation
-        if (!patientId) {
-            errorDiv.classList.remove('d-none');
-            errorDiv.textContent = 'Please select a patient';
-            return;
-        }
-        if (!doctorId) {
-            errorDiv.classList.remove('d-none');
-            errorDiv.textContent = 'Please select a doctor';
-            return;
-        }
-        if (!appointmentDate) {
-            errorDiv.classList.remove('d-none');
-            errorDiv.textContent = 'Please select appointment date and time';
-            return;
-        }
-
-        // Check date is not in past
-        if (new Date(appointmentDate) < new Date()) {
-            errorDiv.classList.remove('d-none');
-            errorDiv.textContent = 'Appointment date cannot be in the past';
-            return;
-        }
-
         errorDiv.classList.add('d-none');
+        successDiv.classList.add('d-none');
+
+        if (!patientId) { errorDiv.classList.remove('d-none'); errorDiv.textContent = 'Please select a patient'; return; }
+        if (!doctorId) { errorDiv.classList.remove('d-none'); errorDiv.textContent = 'Please select a doctor'; return; }
+        if (!appointmentDate) { errorDiv.classList.remove('d-none'); errorDiv.textContent = 'Please select appointment date and time'; return; }
+        if (new Date(appointmentDate) < new Date()) { errorDiv.classList.remove('d-none'); errorDiv.textContent = 'Appointment date cannot be in the past'; return; }
+
         bookBtn.disabled = true;
         bookBtn.textContent = 'Booking...';
 
@@ -136,9 +212,7 @@
             if (response.ok) {
                 successDiv.classList.remove('d-none');
                 successDiv.textContent = 'Appointment booked successfully!';
-                setTimeout(() => {
-                    window.location.href = '/Appointments';
-                }, 1500);
+                setTimeout(() => { window.location.href = '/Appointments'; }, 1500);
             } else {
                 errorDiv.classList.remove('d-none');
                 errorDiv.textContent = result.message;

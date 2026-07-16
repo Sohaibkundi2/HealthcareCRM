@@ -3,50 +3,134 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HealthcareCRM</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HealthcareCRM.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] — HealthcareCRM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body { background: #0a0a0a; font-family: 'Segoe UI', sans-serif; }
+
+        /* Navbar */
+
+        #main-navbar { display: none; }
+
+        .navbar-crm {
+            background: #0a0a0a;
+            padding: 0.9rem 2rem;
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand-crm {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: white !important;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand-crm span { color: #00ff88; }
+
+        .nav-link-crm {
+            color: #888 !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .nav-link-crm:hover {
+            color: white !important;
+            background: #1a1a1a;
+        }
+
+        .nav-link-crm.active {
+            color: #00ff88 !important;
+            background: #0d1f15;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        .user-badge {
+            background: #0d1f15;
+            border: 1px solid #1a3d26;
+            color: #00ff88;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HealthcareCRM</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - HealthcareCRM - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<!-- Navbar — shown only when logged in -->
+<nav class="navbar-crm d-flex justify-content-between align-items-center" id="main-navbar">
+    <div class="d-flex align-items-center gap-4">
+        <a href="/Home/Index" class="navbar-brand-crm">Healthcare<span>CRM</span></a>
+        <div class="d-flex gap-1">
+            <a href="/Home/Index" class="nav-link-crm" id="nav-dashboard">Dashboard</a>
+            <a href="/Patients" class="nav-link-crm" id="nav-patients">Patients</a>
+            <a href="/Doctors" class="nav-link-crm" id="nav-doctors">Doctors</a>
+            <a href="/Appointments" class="nav-link-crm" id="nav-appointments">Appointments</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span class="user-badge" id="user-email">👤 Admin</span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<main>
+    @RenderBody()
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Show navbar only if logged in
+   const token = localStorage.getItem('jwt');
+    const navbar = document.getElementById('main-navbar');
+
+    if (token) {
+        navbar.style.setProperty('display', 'flex', 'important');
+
+        // Decode JWT to get email
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const email = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+            if (email) document.getElementById('user-email').textContent = '👤 ' + email;
+        } catch (e) {}
+    }
+
+    // Highlight active nav link
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('/patients')) document.getElementById('nav-patients').classList.add('active');
+    else if (path.includes('/doctors')) document.getElementById('nav-doctors').classList.add('active');
+    else if (path.includes('/appointments')) document.getElementById('nav-appointments').classList.add('active');
+    else document.getElementById('nav-dashboard').classList.add('active');
+
+    function logout() {
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+    }
+</script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
