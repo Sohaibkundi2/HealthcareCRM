@@ -4,71 +4,229 @@
     ViewData["Title"] = "Patient Detail";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Patient Detail</h2>
-        <a href="/Patients" class="btn btn-secondary">← Back to Patients</a>
+<style>
+    .patient-detail-page {
+        --d-bg: #0a0a0a;
+        --d-panel: #111;
+        --d-border: #222;
+        --d-accent: #00ff88;
+        --d-text: #f2f2f2;
+        --d-muted: #666;
+
+        background: var(--d-bg);
+        color: var(--d-text);
+        font-family: 'Segoe UI', sans-serif;
+        padding: 2.5rem 3rem;
+        min-height: 100vh;
+        border-radius: 12px;
+    }
+
+    .patient-detail-page .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .patient-detail-page .page-header h2 {
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+
+    .patient-detail-page .btn-back {
+        background: transparent;
+        border: 1px solid var(--d-border);
+        color: var(--d-text);
+        padding: 0.5rem 1.1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: border-color 0.15s, color 0.15s;
+    }
+
+    .patient-detail-page .btn-back:hover { border-color: var(--d-accent); color: var(--d-accent); }
+
+    .patient-detail-page .loading {
+        text-align: center;
+        padding: 4rem 0;
+        color: var(--d-muted);
+    }
+
+    .patient-detail-page .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--d-border);
+        border-top-color: var(--d-accent);
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin { to { transform: rotate(360deg); } }
+
+    .patient-detail-page .panel {
+        background: var(--d-panel);
+        border: 1px solid var(--d-border);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .patient-detail-page .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .patient-detail-page .avatar {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: rgba(0,255,136,0.12);
+        color: var(--d-accent);
+        border: 1px solid rgba(0,255,136,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.7rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .patient-detail-page .profile-name {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 0 0.4rem;
+    }
+
+    .patient-detail-page .pill {
+        display: inline-block;
+        background: rgba(0,255,136,0.12);
+        color: var(--d-accent);
+        border: 1px solid rgba(0,255,136,0.3);
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.25rem 0.7rem;
+        border-radius: 100px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .patient-detail-page .profile-email {
+        color: var(--d-muted);
+        font-size: 0.9rem;
+        margin: 0.5rem 0 0;
+    }
+
+    .patient-detail-page .btn-edit {
+        margin-left: auto;
+        background: var(--d-accent);
+        color: #0a0a0a;
+        border: none;
+        padding: 0.6rem 1.3rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .patient-detail-page .btn-edit:hover { opacity: 0.9; }
+
+    .patient-detail-page .panel-title {
+        padding: 1rem 2rem;
+        border-bottom: 1px solid var(--d-border);
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--d-text);
+    }
+
+    .patient-detail-page .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+    }
+
+    .patient-detail-page .info-cell {
+        background: var(--d-bg);
+        border: 1px solid var(--d-border);
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+    }
+
+    .patient-detail-page .info-label {
+        color: var(--d-muted);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 0.35rem;
+    }
+
+    .patient-detail-page .info-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--d-text);
+    }
+
+    @@media (max-width: 700px) {
+        .patient-detail-page .info-grid { grid-template-columns: 1fr; }
+        .patient-detail-page .profile-header { flex-wrap: wrap; }
+        .patient-detail-page .btn-edit { margin-left: 0; }
+    }
+</style>
+
+<div class="patient-detail-page">
+    <div class="page-header">
+        <h2>Patient Detail</h2>
+        <a href="/Patients" class="btn-back">← Back to Patients</a>
     </div>
 
-    <div id="loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted">Loading patient...</p>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading patient...</p>
     </div>
 
     <div id="patient-detail" class="d-none">
-        <!-- Profile Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-body d-flex align-items-center gap-4 p-4">
-                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                     style="width:80px; height:80px; font-size:2rem;" id="avatar-initials">
-                </div>
+        <div class="panel">
+            <div class="profile-header">
+                <div class="avatar" id="avatar-initials"></div>
                 <div>
-                    <h3 class="fw-bold mb-1" id="detail-fullName"></h3>
-                    <span class="badge bg-success" id="detail-gender"></span>
-                    <p class="text-muted mb-0 mt-1" id="detail-email"></p>
+                    <h3 class="profile-name" id="detail-fullName"></h3>
+                    <span class="pill" id="detail-gender"></span>
+                    <p class="profile-email" id="detail-email"></p>
                 </div>
-                <div class="ms-auto">
-                    <button class="btn btn-warning" onclick="goToEdit()">✏️ Edit Patient</button>
-                </div>
+                <button class="btn-edit" onclick="goToEdit()">Edit Patient</button>
             </div>
         </div>
 
-        <!-- Details Card -->
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white fw-semibold">
-                Patient Information
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">📞 Phone</small>
-                            <strong id="detail-phone"></strong>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">🎂 Date of Birth</small>
-                            <strong id="detail-dob"></strong>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">📍 Address</small>
-                            <strong id="detail-address"></strong>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
-                            <small class="text-muted d-block">📅 Registered On</small>
-                            <strong id="detail-createdAt"></strong>
-                        </div>
-                    </div>
+        <div class="panel">
+            <div class="panel-title">Patient Information</div>
+            <div class="info-grid">
+                <div class="info-cell">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value" id="detail-phone"></span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value" id="detail-dob"></span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Address</span>
+                    <span class="info-value" id="detail-address"></span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Registered On</span>
+                    <span class="info-value" id="detail-createdAt"></span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     const token = localStorage.getItem('jwt');
 
@@ -98,7 +256,7 @@
 
             if (!response.ok) {
                 document.getElementById('loading').innerHTML =
-                    '<p class="text-danger">Patient not found.</p>';
+                    '<p style="color:#ff6b6b;">Patient not found.</p>';
                 return;
             }
 
@@ -127,6 +285,13 @@
                     day: 'numeric'
                 });
 
+                const dob = new Date(p.dateOfBirth);
+                const age = Math.floor((new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000));
+                document.getElementById('detail-dob').textContent =
+                    new Date(p.dateOfBirth).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric'
+                    }) + ` (Age: ${age})`;
+
             document.getElementById('detail-address').textContent =
                 p.address || '—';
 
@@ -144,9 +309,9 @@
             console.error('Failed to load patient:', error);
 
             document.getElementById('loading').innerHTML = `
-                <div class="text-center">
-                    <p class="text-danger mb-2">Unable to load patient.</p>
-                    <button class="btn btn-primary btn-sm" onclick="loadPatient()">
+                <div>
+                    <p style="color:#ff6b6b; margin-bottom: 0.75rem;">Unable to load patient.</p>
+                    <button class="btn-back" style="cursor:pointer;" onclick="loadPatient()">
                         Try Again
                     </button>
                 </div>
