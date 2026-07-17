@@ -54,5 +54,14 @@ namespace HealthcareCRM.Controllers
 
             return Ok(new { token, message = "Registration successful" });
         }
+
+        // POST /api/auth/logout
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // Clear JWT cookie if exists
+            Response.Cookies.Delete("jwt");
+            return Ok(new { message = "Logged out successfully" });
+        }
     }
 }
