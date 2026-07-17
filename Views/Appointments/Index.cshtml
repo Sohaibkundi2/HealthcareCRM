@@ -314,7 +314,7 @@
                     <td style="color:#888;">${new Date(a.appointmentDate).toLocaleString()}</td>
                     <td>${getStatusBadge(a.status)}</td>
                     <td>
-                        <button class="btn-action update" onclick="showStatusModal(${a.id}, ${JSON.stringify(a.status)})">Update</button>
+                        <button class="btn-action update" onclick="showStatusModal(${a.id}, '${a.status}')">Update</button>
                         ${a.status !== 'Cancelled' ? `<button class="btn-action cancel" onclick="showCancelConfirm(${a.id})">Cancel</button>` : ''}
                     </td>
                 </tr>
