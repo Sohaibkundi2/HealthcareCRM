@@ -335,7 +335,7 @@
                     <td>
                         <button class="btn-edit me-1" onclick="showEditForm(${JSON.stringify(d).replace(/"/g, '&quot;')})">Edit</button>
                         <button class="btn-deactivate ${!d.isActive ? 'btn-reactivate' : ''}"
-                            onclick="showToggleConfirm(${d.id}, ${d.isActive}, ${JSON.stringify(d.name)})">
+                            onclick="showToggleConfirm(${d.id}, ${d.isActive}, '${d.name.replace(/'/g, "\\'")}')">
                             ${d.isActive ? 'Deactivate' : 'Reactivate'}
                         </button>
                     </td>
