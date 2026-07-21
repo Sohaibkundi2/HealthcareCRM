@@ -39,25 +39,22 @@ namespace HealthcareCRM.Services
         // Register new user
         public async Task<bool> RegisterUser(RegisterViewModel model)
         {
-            // Check if email already exists
             var existingUser = GetUserByEmail(model.Email);
 
             if (existingUser != null)
                 return false;
 
-            // Create user
             var user = new User
             {
                 FullName = model.FullName,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                Role = "Admin",
+                Role = string.IsNullOrWhiteSpace(model.Role) ? "Staff" : model.Role,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
             return true;
         }
 

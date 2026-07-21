@@ -18,5 +18,7 @@ namespace HealthcareCRM.Models
         [Required(ErrorMessage = "Please confirm your password")]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        public string Role { get; set; } = "Staff";
     }
 }

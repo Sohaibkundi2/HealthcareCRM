@@ -1,0 +1,284 @@
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<style>
+    body { background: #0a0a0a !important; color: white; }
+    .page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+
+    .dark-card {
+        background: #111;
+        border: 1px solid #1a1a1a;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .dark-table { color: white; width: 100%; border-collapse: collapse; }
+
+    .dark-table thead th {
+        background: #0d0d0d;
+        color: #555;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .dark-table tbody td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #111;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .dark-table tbody tr:hover { background: #151515; }
+
+    .badge-admin {
+        background: #1f0a00;
+        color: #ff6600;
+        border: 1px solid #ff6600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .badge-staff {
+        background: #0d1f15;
+        color: #00ff88;
+        border: 1px solid #1a3d26;
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .btn-action {
+        background: #1a1a1a;
+        color: #aaa;
+        border: 1px solid #222;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-right: 0.3rem;
+    }
+
+    .btn-action:hover { border-color: #00ff88; color: #00ff88; }
+    .btn-action.danger:hover { border-color: #ff4444; color: #ff4444; }
+
+    .access-denied {
+        text-align: center;
+        padding: 4rem;
+        color: #555;
+    }
+
+    .access-denied div { font-size: 3rem; margin-bottom: 1rem; }
+
+    .spinner-border { color: #00ff88 !important; }
+
+    .modal-content {
+        background: #111 !important;
+        border: 1px solid #222 !important;
+        color: white !important;
+    }
+
+    .modal-header { border-bottom: 1px solid #1a1a1a !important; }
+    .modal-footer { border-top: 1px solid #1a1a1a !important; }
+    .btn-close { filter: invert(1); }
+
+    .dark-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #888;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .dark-select {
+        background: #0a0a0a !important;
+        border: 1px solid #262626 !important;
+        color: white !important;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .dark-select option { background: #111; }
+
+    .btn-save {
+        background: #00ff88;
+        color: #0a0a0a;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-cancel-modal {
+        background: transparent;
+        color: #555;
+        border: 1px solid #222;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title mb-0">⚙️ User Management</h2>
+        <span style="color:#555; font-size:0.85rem;">Admin only</span>
+    </div>
+
+    <div id="access-denied" class="access-denied d-none">
+        <div>🔒</div>
+        <p>Access Denied — Admin only</p>
+        <a href="/Home/Index" style="color:#00ff88;">← Back to Dashboard</a>
+    </div>
+
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2" style="color:#555;">Loading users...</p>
+    </div>
+
+    <div class="dark-card d-none" id="users-card">
+        <table class="dark-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="users-table"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Change Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Change Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="role-user-id" />
+                <label class="dark-label">Select Role</label>
+                <select id="role-select" class="dark-select">
+                    <option value="Admin">Admin</option>
+                    <option value="Staff">Staff</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel-modal" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn-save" onclick="confirmRoleChange()">Update Role</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    if (!token) window.location.href = '/Account/Login';
+
+    // Check role from JWT
+    let userRole = 'Staff';
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Staff';
+    } catch (e) {}
+
+    // Block non-admin users
+    if (userRole !== 'Admin') {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('access-denied').classList.remove('d-none');
+    } else {
+        loadUsers();
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text || ''));
+        return div.innerHTML;
+    }
+
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/admin/users', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.status === 403) {
+                document.getElementById('loading').classList.add('d-none');
+                document.getElementById('access-denied').classList.remove('d-none');
+                return;
+            }
+
+            const result = await response.json();
+
+            document.getElementById('loading').classList.add('d-none');
+            document.getElementById('users-card').classList.remove('d-none');
+
+            document.getElementById('users-table').innerHTML = result.data.map((u, i) => `
+                <tr>
+                    <td style="color:#555;">${i + 1}</td>
+                    <td style="font-weight:600;">${escapeHtml(u.fullName)}</td>
+                    <td style="color:#888;">${escapeHtml(u.email)}</td>
+                    <td>
+                        <span class="${u.role === 'Admin' ? 'badge-admin' : 'badge-staff'}">
+                            ${u.role}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-action" onclick="showRoleModal(${u.id}, '${u.role}')">Change Role</button>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (err) {
+            document.getElementById('loading').innerHTML =
+                '<p style="color:#ff6b6b; text-align:center;">Failed to load users.</p>';
+        }
+    }
+
+    function showRoleModal(id, currentRole) {
+        document.getElementById('role-user-id').value = id;
+        document.getElementById('role-select').value = currentRole;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('roleModal')).show();
+    }
+
+    async function confirmRoleChange() {
+        const id = document.getElementById('role-user-id').value;
+        const role = document.getElementById('role-select').value;
+
+        try {
+            const response = await fetch(`/api/admin/users/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ role })
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('roleModal')).hide();
+
+            if (response.ok) {
+                loadUsers();
+            } else {
+                alert('Failed to update role');
+            }
+        } catch (err) {
+            alert('Something went wrong');
+        }
+    }
+</script>
