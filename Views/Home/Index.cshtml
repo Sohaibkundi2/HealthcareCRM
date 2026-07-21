@@ -5,6 +5,8 @@
 <style>
     body { background: #0a0a0a !important; color: white; }
 
+    .page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+
     .stat-card {
         background: #111;
         border: 1px solid #1a1a1a;
@@ -66,33 +68,44 @@
 
     .quick-action:hover { border-color: #00ff88; color: #00ff88; }
 
-    .recent-card {
+    .dark-card {
         background: #111;
         border: 1px solid #1a1a1a;
         border-radius: 12px;
         padding: 1.5rem;
     }
 
-    .table { color: white; }
-    .table thead th {
+    .dark-table { color: white; width: 100%; border-collapse: collapse; }
+
+    .dark-table thead th {
         color: #555;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 1px;
-        border-color: #1a1a1a;
+        font-weight: 700;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .dark-table tbody td {
+        padding: 0.85rem 0;
+        border-bottom: 1px solid #111;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .dark-table tbody tr:hover { background: #151515; }
+
+    .status-badge {
+        padding: 0.2rem 0.65rem;
+        border-radius: 100px;
+        font-size: 0.72rem;
         font-weight: 700;
     }
 
-    .table td { border-color: #1a1a1a; font-size: 0.9rem; vertical-align: middle; }
-    .table tbody tr:hover { background: #151515; }
-
-    .table-dark-custom {
-    --bs-table-bg: transparent;
-    --bs-table-striped-bg: #151515;
-    --bs-table-hover-bg: #151515;
-    --bs-table-border-color: #1a1a1a;
-    --bs-table-color: white;
-}
+    .status-pending { background: #1f1a0d; color: #ffc107; border: 1px solid #3d3010; }
+    .status-confirmed { background: #0d1f15; color: #00ff88; border: 1px solid #1a3d26; }
+    .status-cancelled { background: #1f0d0d; color: #ff4444; border: 1px solid #3d1a1a; }
 
     .welcome-name { color: #00ff88; }
 
@@ -105,10 +118,16 @@
         font-size: 0.8rem;
     }
 
-    .divider {
-        border-color: #1a1a1a;
-        margin: 1.5rem 0;
+    .divider { border-color: #1a1a1a; margin: 1.5rem 0; }
+
+    .chart-wrap {
+        background: #111;
+        border: 1px solid #1a1a1a;
+        border-radius: 12px;
+        padding: 1.5rem;
     }
+
+    .spinner-border { color: #00ff88 !important; }
 </style>
 
 <div class="container py-4">
@@ -116,8 +135,8 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <p class="text-muted mb-0" style="font-size: 0.85rem; color: #555 !important;">Good day 👋</p>
-            <h2 class="fw-bold mb-0" id="welcome-msg">Dashboard</h2>
+            <p class="mb-0" style="font-size: 0.85rem; color: #555;">Good day 👋</p>
+            <h2 class="page-title fw-bold mb-0" id="welcome-msg">Dashboard</h2>
         </div>
         <div class="date-badge" id="current-date"></div>
     </div>
@@ -154,6 +173,18 @@
             <div class="stat-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
+                        <div class="stat-label">Today</div>
+                        <div class="stat-number" id="stat-today">—</div>
+                        <a href="/Appointments" class="stat-link">View all →</a>
+                    </div>
+                    <div class="stat-icon">📅</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
                         <div class="stat-label">Pending</div>
                         <div class="stat-number" id="stat-pending">—</div>
                         <a href="/Appointments" class="stat-link">View all →</a>
@@ -162,22 +193,52 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="stat-label">Confirmed</div>
-                        <div class="stat-number" id="stat-confirmed">—</div>
-                        <a href="/Appointments" class="stat-link">View all →</a>
-                    </div>
-                    <div class="stat-icon">✅</div>
+    </div>
+
+    <!-- Chart + Recent -->
+    <div class="row g-3 mb-4">
+
+        <!-- Chart -->
+        <div class="col-md-5">
+            <div class="chart-wrap h-100">
+                <div class="section-title">Appointment Status</div>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="col-md-7">
+            <div class="dark-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="section-title mb-0">Recent Appointments</div>
+                    <a href="/Appointments" class="stat-link">View all →</a>
+                </div>
+
+                <div id="recent-loading" class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm"></div>
+                </div>
+
+                <table class="dark-table d-none" id="recent-table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-tbody"></tbody>
+                </table>
+
+                <div id="recent-empty" class="text-center py-3 d-none" style="color:#555;">
+                    No appointments yet.
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="mb-4">
+    <div class="dark-card">
         <div class="section-title">Quick Actions</div>
         <div class="d-flex gap-2 flex-wrap">
             <a href="/Patients" class="quick-action">+ Add Patient</a>
@@ -186,36 +247,9 @@
             <a href="/swagger" target="_blank" class="quick-action">📖 API Docs</a>
         </div>
     </div>
-
-    <!-- Recent Appointments -->
-    <div class="recent-card">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="section-title mb-0">Recent Appointments</div>
-            <a href="/Appointments" class="stat-link">View all →</a>
-        </div>
-
-        <div id="recent-loading" class="text-center py-3">
-            <div class="spinner-border spinner-border-sm" style="color: #00ff88;"></div>
-        </div>
-
-        <table class="table table-dark-custom d-none" id="recent-table">
-            <thead>
-                <tr>
-                    <th>Patient</th>
-                    <th>Doctor</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="recent-tbody"></tbody>
-        </table>
-
-        <div id="recent-empty" class="text-center py-3 d-none" style="color: #555;">
-            No appointments yet.
-        </div>
-    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     if (!token) window.location.href = '/Account/Login';
 
@@ -228,39 +262,59 @@
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const name = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-        if (name) document.getElementById('welcome-msg').innerHTML = `Welcome back, <span class="welcome-name">${name}</span>`;
+        if (name) document.getElementById('welcome-msg').innerHTML =
+            `Welcome back, <span class="welcome-name">${name}</span>`;
     } catch (e) {}
+
+    let chartInstance = null;
 
     async function loadDashboard() {
         try {
-            // Patients count
-            const pRes = await fetch('/api/patients?pageSize=1000', {
+            // Load stats from dedicated endpoint
+            const statsRes = await fetch('/api/dashboard/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const pData = await pRes.json();
-            document.getElementById('stat-patients').textContent = pData.totalCount ?? 0;
+            const statsData = await statsRes.json();
+            const s = statsData.data;
 
-            // Doctors count
-            const dRes = await fetch('/api/doctors', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            document.getElementById('stat-patients').textContent = s.totalPatients;
+            document.getElementById('stat-doctors').textContent = s.totalDoctors;
+            document.getElementById('stat-today').textContent = s.appointmentsToday;
+            document.getElementById('stat-pending').textContent = s.pendingCount;
+
+            // Chart
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pending', 'Confirmed', 'Cancelled'],
+                    datasets: [{
+                        data: [s.pendingCount, s.confirmedCount, s.cancelledCount],
+                        backgroundColor: ['#1f1a0d', '#0d1f15', '#1f0d0d'],
+                        borderColor: ['#ffc107', '#00ff88', '#ff4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#888', font: { size: 12 } }
+                        }
+                    }
+                }
             });
-            const dData = await dRes.json();
-            document.getElementById('stat-doctors').textContent = dData.data?.length ?? 0;
 
-            // Appointments
+            // Recent appointments
             const aRes = await fetch('/api/appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const aData = await aRes.json();
             const appointments = aData.data || [];
-
-            document.getElementById('stat-pending').textContent =
-                appointments.filter(a => a.status === 'Pending').length;
-            document.getElementById('stat-confirmed').textContent =
-                appointments.filter(a => a.status === 'Confirmed').length;
-
-            // Recent 5
             const recent = appointments.slice(0, 5);
+
             document.getElementById('recent-loading').classList.add('d-none');
 
             if (recent.length === 0) {
@@ -272,18 +326,13 @@
             document.getElementById('recent-tbody').innerHTML = recent.map(a => `
                 <tr>
                     <td>${a.patient?.fullName || '—'}</td>
-                    <td>${a.doctor?.name || '—'}</td>
-                    <td>${new Date(a.appointmentDate).toLocaleDateString()}</td>
+                    <td style="color:#888;">${a.doctor?.name || '—'}</td>
+                    <td style="color:#888;">${new Date(a.appointmentDate).toLocaleDateString()}</td>
                     <td>
-                        <span style="
-                            padding: 0.25rem 0.75rem;
-                            border-radius: 100px;
-                            font-size: 0.75rem;
-                            font-weight: 700;
-                            background: ${a.status === 'Confirmed' ? '#0d1f15' : a.status === 'Cancelled' ? '#1f0d0d' : '#1f1a0d'};
-                            color: ${a.status === 'Confirmed' ? '#00ff88' : a.status === 'Cancelled' ? '#ff4444' : '#ffc107'};
-                            border: 1px solid ${a.status === 'Confirmed' ? '#1a3d26' : a.status === 'Cancelled' ? '#3d1a1a' : '#3d3010'};
-                        ">${a.status}</span>
+                        <span class="status-badge ${
+                            a.status === 'Confirmed' ? 'status-confirmed' :
+                            a.status === 'Cancelled' ? 'status-cancelled' : 'status-pending'
+                        }">${a.status}</span>
                     </td>
                 </tr>
             `).join('');
