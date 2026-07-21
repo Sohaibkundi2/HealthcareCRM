@@ -208,6 +208,14 @@
             <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
             <span asp-validation-for="ConfirmPassword" class="field-error"></span>
         </div>
+        <div class="form-group">
+            <label class="form-label">Role</label>
+            <select id="Role" class="form-control" style="background:#0a0a0a; color:white; border:1px solid #262626;">
+                <option value="Staff">Staff</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+
         <button type="submit" id="register-btn" class="btn-submit">Register</button>
         <div class="auth-footer">
             Already have an account? <a asp-action="Login" asp-controller="Account">Login</a>
@@ -223,6 +231,7 @@
         const email = document.getElementById('Email').value;
         const password = document.getElementById('Password').value;
         const confirmPassword = document.getElementById('ConfirmPassword').value;
+        const role = document.getElementById('Role').value ;
         const errorAlert = document.getElementById('error-alert');
         const registerBtn = document.getElementById('register-btn');
 
@@ -256,7 +265,7 @@
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, email, password, confirmPassword })
+                body: JSON.stringify({ fullName, email, password, confirmPassword, role })
             });
 
             const data = await response.json();

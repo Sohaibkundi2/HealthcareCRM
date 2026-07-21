@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthcareCRM.Models;
 using HealthcareCRM.Services;
+using HealthcareCRM.Helpers;
 
 namespace HealthcareCRM.Controllers
 {
@@ -103,6 +104,7 @@ namespace HealthcareCRM.Controllers
 
         // DELETE /api/patients/{id}
         [HttpDelete("{id}")]
+        [RequireRole("Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _patientService.DeletePatient(id);

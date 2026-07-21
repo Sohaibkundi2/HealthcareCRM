@@ -11,10 +11,6 @@
     <style>
         body { background: #0a0a0a; font-family: 'Segoe UI', sans-serif; }
 
-        /* Navbar */
-
-        .navbar-hidden { display: none !important; }
-
         .navbar-crm {
             background: #0a0a0a;
             padding: 0.9rem 2rem;
@@ -65,12 +61,29 @@
             transition: border-color 0.2s, color 0.2s;
         }
 
-        .btn-logout:hover {
-            border-color: #ff4444;
-            color: #ff4444;
-        }
+        .btn-logout:hover { border-color: #ff4444; color: #ff4444; }
 
         .user-badge {
+            background: #0d1f15;
+            border: 1px solid #1a3d26;
+            color: #00ff88;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-badge-admin {
+            background: #1f0a00;
+            border: 1px solid #ff6600;
+            color: #ff6600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-badge-staff {
             background: #0d1f15;
             border: 1px solid #1a3d26;
             color: #00ff88;
@@ -84,7 +97,6 @@
 </head>
 <body>
 
-<!-- Navbar — shown only when logged in -->
 <nav class="navbar-crm d-flex justify-content-between align-items-center" id="main-navbar" style="display:none;">
     <div class="d-flex align-items-center gap-4">
         <a href="/Home/Index" class="navbar-brand-crm">Healthcare<span>CRM</span></a>
@@ -93,10 +105,12 @@
             <a href="/Patients" class="nav-link-crm" id="nav-patients">Patients</a>
             <a href="/Doctors" class="nav-link-crm" id="nav-doctors">Doctors</a>
             <a href="/Appointments" class="nav-link-crm" id="nav-appointments">Appointments</a>
+            <a href="/Admin/Users" class="nav-link-crm" id="nav-admin" style="display:none;">⚙️ Admin</a>
         </div>
     </div>
     <div class="d-flex align-items-center gap-3">
-        <span class="user-badge" id="user-email">👤 Admin</span>
+        <span class="user-badge" id="user-email">👤 User</span>
+        <span id="role-badge" class="role-badge-staff">Staff</span>
         <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 </nav>
@@ -107,23 +121,41 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Show navbar only if logged in , token is defined in header of this file.
     const navbar = document.getElementById('main-navbar');
+    const roleBadge = document.getElementById('role-badge');
 
     if (token) {
         navbar.style.display = 'flex';
 
-        // Decode JWT to get email
+        // Decode JWT
+        let userRole = 'Staff';
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
+
+            // Set email
             const email = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
             if (email) document.getElementById('user-email').textContent = '👤 ' + email;
+
+            // Set role
+            userRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Staff';
+
         } catch (e) {}
+
+        // Update role badge
+        if (userRole === 'Admin') {
+            roleBadge.textContent = 'Admin';
+            roleBadge.className = 'role-badge-admin';
+            document.getElementById('nav-admin').style.display = 'inline-block';
+        } else {
+            roleBadge.textContent = 'Staff';
+            roleBadge.className = 'role-badge-staff';
+        }
     }
 
     // Highlight active nav link
     const path = window.location.pathname.toLowerCase();
-    if (path.includes('/patients')) document.getElementById('nav-patients').classList.add('active');
+    if (path.includes('/admin')) document.getElementById('nav-admin').classList.add('active');
+    else if (path.includes('/patients')) document.getElementById('nav-patients').classList.add('active');
     else if (path.includes('/doctors')) document.getElementById('nav-doctors').classList.add('active');
     else if (path.includes('/appointments')) document.getElementById('nav-appointments').classList.add('active');
     else document.getElementById('nav-dashboard').classList.add('active');
@@ -134,14 +166,12 @@
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-        } catch (e) {
-            // Continue logout even if API fails
-        } finally {
+        } catch (e) {}
+        finally {
             localStorage.removeItem('jwt');
             window.location.href = '/';
         }
     }
-
 </script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
