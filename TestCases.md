@@ -49,3 +49,28 @@
 | 8 | Update Appointment Status | 1. Click Update on appointment 2. Select Confirmed 3. Click Update | Status badge updates to Confirmed | ✅ Pass |
 | 9 | Cancel Appointment | 1. Click Cancel on appointment 2. Confirm dialog | Status updates to Cancelled, Cancel button hidden | ✅ Pass |
 | 10 | Dashboard Stats | 1. Go to /Home/Index | Shows correct counts for patients, doctors, pending and confirmed appointments | ✅ Pass |
+
+## Dashboard Stats Test Cases (5)
+
+| # | Test Case | Steps | Expected Result | Status |
+|---|-----------|-------|----------------|--------|
+| 1 | Stats load on dashboard | 1. Login 2. Go to /Home/Index | All metric cards show correct numbers from database | ✅ Pass |
+| 2 | Stats with zero records | 1. Empty database 2. Go to /Home/Index | All cards show 0, chart shows empty state | ✅ Pass |
+| 3 | Chart renders correctly | 1. Login 2. Go to /Home/Index | Doughnut chart shows Pending, Confirmed, Cancelled breakdown | ✅ Pass |
+| 4 | Appointments today count | 1. Book appointment for today 2. Go to /Home/Index | Today's count increments by 1 | ✅ Pass |
+| 5 | Stats endpoint unauthorized | 1. Call GET /api/dashboard/stats without token | Returns 401 Unauthorized | ✅ Pass |
+
+## RBAC Test Cases (10)
+
+| # | Test Case | Steps | Expected Result | Status |
+|---|-----------|-------|----------------|--------|
+| 1 | Admin sees Admin badge | 1. Login as Admin | Orange Admin badge shown in navbar | ✅ Pass |
+| 2 | Staff sees Staff badge | 1. Login as Staff | Green Staff badge shown in navbar | ✅ Pass |
+| 3 | Admin menu visible for Admin | 1. Login as Admin | ⚙️ Admin link visible in navbar | ✅ Pass |
+| 4 | Admin menu hidden for Staff | 1. Login as Staff | ⚙️ Admin link not visible in navbar | ✅ Pass |
+| 5 | Staff blocked from Admin page | 1. Login as Staff 2. Go to /Admin/Users directly | Access Denied page shown | ✅ Pass |
+| 6 | Admin can access Admin page | 1. Login as Admin 2. Go to /Admin/Users | User list shown successfully | ✅ Pass |
+| 7 | Staff blocked from delete patient | 1. Login as Staff 2. Call DELETE /api/patients/1 in Postman | Returns 403 Forbidden | ✅ Pass |
+| 8 | Admin can delete patient | 1. Login as Admin 2. Call DELETE /api/patients/1 in Postman with Admin token | Patient deleted successfully | ✅ Pass |
+| 9 | Admin can change user role | 1. Login as Admin 2. Go to /Admin/Users 3. Change Staff to Admin | Role updated, badge changes on next login | ✅ Pass |
+| 10 | Invalid token blocked | 1. Call GET /api/admin/users with invalid token | Returns 401 Unauthorized | ✅ Pass |
