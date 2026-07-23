@@ -2,233 +2,6 @@
     ViewData["Title"] = "Patients";
 }
 
-<style>
-    .patients-page {
-        --p-bg: #0a0a0a;
-        --p-panel: #111;
-        --p-border: #222;
-        --p-border-soft: #1a1a1a;
-        --p-accent: #00ff88;
-        --p-text: #f2f2f2;
-        --p-muted: #666;
-        --p-danger: #ff6b6b;
-        --p-warning: #ffcc66;
-        --p-info: #6ec8ff;
-
-        background: var(--p-bg);
-        color: var(--p-text);
-        font-family: 'Segoe UI', sans-serif;
-        padding: 2.5rem 3rem;
-        min-height: 100vh;
-        border-radius: 12px;
-    }
-
-    .patients-page .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.75rem;
-    }
-
-    .patients-page .page-header h2 {
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-    }
-
-    .patients-page .page-header svg {
-        width: 22px;
-        height: 22px;
-        filter: drop-shadow(0 0 4px rgba(0,255,136,0.6));
-    }
-
-    .patients-page .btn-accent {
-        background: var(--p-accent);
-        color: #0a0a0a;
-        border: none;
-        padding: 0.6rem 1.3rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: opacity 0.2s, transform 0.15s;
-    }
-
-    .patients-page .btn-accent:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    .patients-page .search-wrap { margin-bottom: 1.25rem; }
-
-    .patients-page .search-input {
-        width: 100%;
-        background: var(--p-panel);
-        border: 1px solid var(--p-border);
-        color: var(--p-text);
-        padding: 0.7rem 1rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-    }
-
-    .patients-page .search-input::placeholder { color: #444; }
-
-    .patients-page .search-input:focus {
-        outline: none;
-        border-color: var(--p-accent);
-        box-shadow: 0 0 0 3px rgba(0,255,136,0.12);
-    }
-
-    .patients-page .panel {
-        background: var(--p-panel);
-        border: 1px solid var(--p-border);
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    .patients-page table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
-    }
-
-    .patients-page thead th {
-        text-align: left;
-        padding: 0.9rem 1.25rem;
-        color: var(--p-muted);
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        font-weight: 700;
-        border-bottom: 1px solid var(--p-border);
-    }
-
-    .patients-page tbody td {
-        padding: 0.9rem 1.25rem;
-        border-bottom: 1px solid var(--p-border-soft);
-        color: var(--p-text);
-    }
-
-    .patients-page tbody tr:last-child td { border-bottom: none; }
-    .patients-page tbody tr:hover { background: rgba(0,255,136,0.03); }
-
-    .patients-page .empty-row {
-        text-align: center;
-        color: var(--p-muted);
-        padding: 2.5rem 0;
-    }
-
-    .patients-page .btn-ghost {
-        background: transparent;
-        border: 1px solid var(--p-border);
-        color: var(--p-text);
-        padding: 0.35rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 0.35rem;
-        cursor: pointer;
-        transition: border-color 0.15s, color 0.15s;
-    }
-
-    .patients-page .btn-ghost.view:hover { border-color: var(--p-info); color: var(--p-info); }
-    .patients-page .btn-ghost.edit:hover { border-color: var(--p-warning); color: var(--p-warning); }
-    .patients-page .btn-ghost.delete:hover { border-color: var(--p-danger); color: var(--p-danger); }
-
-    .patients-page .pagination-row {
-        display: flex;
-        justify-content: center;
-        gap: 0.4rem;
-        padding: 1.25rem;
-    }
-
-    .patients-page .page-btn {
-        background: transparent;
-        border: 1px solid var(--p-border);
-        color: var(--p-text);
-        width: 34px;
-        height: 34px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: border-color 0.15s, color 0.15s;
-    }
-
-    .patients-page .page-btn:hover { border-color: var(--p-accent); color: var(--p-accent); }
-    .patients-page .page-btn.active { background: var(--p-accent); color: #0a0a0a; border-color: var(--p-accent); font-weight: 700; }
-    .patients-page .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .patients-page .page-btn.text-btn { width: auto; padding: 0 0.9rem; }
-
-    /* Modal overrides */
-    .patients-page .modal-content {
-        background: var(--p-panel);
-        border: 1px solid var(--p-border);
-        border-radius: 14px;
-        color: var(--p-text);
-    }
-
-    .patients-page .modal-header,
-    .patients-page .modal-footer {
-        border-color: var(--p-border);
-    }
-
-    .patients-page .modal-title { font-weight: 700; }
-
-    .patients-page .btn-close {
-        filter: invert(1) grayscale(1) brightness(1.6);
-    }
-
-    .patients-page .form-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #aaa;
-    }
-
-    .patients-page .form-control,
-    .patients-page .form-select {
-        background: var(--p-bg);
-        border: 1px solid var(--p-border);
-        color: var(--p-text);
-    }
-
-    .patients-page .form-control::placeholder { color: #444; }
-
-    .patients-page .form-control:focus,
-    .patients-page .form-select:focus {
-        background: var(--p-bg);
-        border-color: var(--p-accent);
-        color: var(--p-text);
-        box-shadow: 0 0 0 3px rgba(0,255,136,0.12);
-    }
-
-    .patients-page .alert-danger {
-        background: #2a1212;
-        border: 1px solid #4a1f1f;
-        color: #ff8f8f;
-    }
-
-    .patients-page .btn-secondary {
-        background: transparent;
-        border: 1px solid var(--p-border);
-        color: var(--p-text);
-    }
-
-    .patients-page .btn-danger {
-        background: var(--p-danger);
-        border: none;
-        color: #1a0000;
-        font-weight: 700;
-    }
-
-    .patients-page .btn-primary {
-        background: var(--p-accent);
-        border: none;
-        color: #0a0a0a;
-        font-weight: 700;
-    }
-</style>
-
 <div class="patients-page">
     <div class="page-header">
         <h2>
@@ -282,27 +55,27 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="form-error" class="alert alert-danger d-none"></div>
+                    <div id="form-error" class="alert-crm alert-crm-error d-none"></div>
                     <input type="hidden" id="patient-id" />
                     <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" id="fullName" class="form-control" placeholder="Enter full name" />
+                        <label class="dark-label">Full Name</label>
+                        <input type="text" id="fullName" class="dark-input" placeholder="Enter full name" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" id="email" class="form-control" placeholder="Enter email" />
+                        <label class="dark-label">Email</label>
+                        <input type="email" id="email" class="dark-input" placeholder="Enter email" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="text" id="phone" class="form-control" placeholder="Enter phone number" />
+                        <label class="dark-label">Phone</label>
+                        <input type="text" id="phone" class="dark-input" placeholder="Enter phone number" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" id="dateOfBirth" class="form-control" />
+                        <label class="dark-label">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" class="dark-input" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Gender</label>
-                        <select id="gender" class="form-select">
+                        <label class="dark-label">Gender</label>
+                        <select id="gender" class="dark-select">
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -310,13 +83,13 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Address</label>
-                        <textarea id="address" class="form-control" placeholder="Enter address"></textarea>
+                        <label class="dark-label">Address</label>
+                        <textarea id="address" class="dark-textarea" placeholder="Enter address"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="savePatient()">Save</button>
+                    <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-accent" onclick="savePatient()">Save</button>
                 </div>
             </div>
         </div>

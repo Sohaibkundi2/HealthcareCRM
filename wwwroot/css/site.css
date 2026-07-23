@@ -1,31 +1,1147 @@
-html {
-  font-size: 14px;
-}
+/* ================================================
+   HealthcareCRM — Global Styles
+   site.css — shared across all pages
+   ================================================ */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Base */
 body {
-  margin-bottom: 60px;
+    background: #0a0a0a;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* ── Typography ── */
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.text-muted-crm {
+    color: #555 !important;
+}
+
+.text-accent {
+    color: #00ff88;
+}
+
+/* ── Cards ── */
+.dark-card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.dark-card-table {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── Tables ── */
+.dark-table {
+    color: white;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .dark-table thead th {
+        background: #0d0d0d;
+        color: #555;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .dark-table tbody td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #111;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .dark-table tbody tr:hover {
+        background: #151515;
+    }
+
+/* ── Buttons ── */
+.btn-primary-crm {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    display: inline-block;
+}
+
+    .btn-primary-crm:hover {
+        opacity: 0.85;
+        color: #0a0a0a;
+        transform: translateY(-1px);
+    }
+
+.btn-ghost-crm {
+    background: transparent;
+    color: #aaa;
+    border: 1px solid #222;
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    .btn-ghost-crm:hover {
+        border-color: #555;
+        color: white;
+    }
+
+    .btn-ghost-crm.view:hover {
+        border-color: #6ec8ff;
+        color: #6ec8ff;
+    }
+
+    .btn-ghost-crm.edit:hover {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
+
+    .btn-ghost-crm.delete:hover {
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+
+    .btn-ghost-crm.success:hover {
+        border-color: #00ff88;
+        color: #00ff88;
+    }
+
+.btn-back-crm {
+    background: transparent;
+    border: 1px solid #222;
+    color: #aaa;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+}
+
+    .btn-back-crm:hover {
+        border-color: #00ff88;
+        color: #00ff88;
+    }
+
+/* ── Forms ── */
+.dark-input {
+    background: #0a0a0a !important;
+    border: 1px solid #262626 !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+    .dark-input::placeholder {
+        color: #444;
+    }
+
+    .dark-input:focus {
+        outline: none;
+        border-color: #00ff88 !important;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1) !important;
+    }
+
+.dark-select {
+    background: #0a0a0a !important;
+    border: 1px solid #262626 !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+    .dark-select:focus {
+        outline: none;
+        border-color: #00ff88 !important;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1) !important;
+    }
+
+    .dark-select option {
+        background: #111;
+    }
+
+.dark-textarea {
+    background: #0a0a0a !important;
+    border: 1px solid #262626 !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 90px;
+    font-family: inherit;
+}
+
+    .dark-textarea::placeholder {
+        color: #444;
+    }
+
+    .dark-textarea:focus {
+        outline: none;
+        border-color: #00ff88 !important;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1) !important;
+    }
+
+.dark-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* ── Badges ── */
+.badge-active {
+    background: #0d1f15;
+    color: #00ff88;
+    border: 1px solid #1a3d26;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-inactive {
+    background: #1a1a1a;
+    color: #555;
+    border: 1px solid #222;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-admin {
+    background: #1f0a00;
+    color: #ff6600;
+    border: 1px solid #ff6600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-staff {
+    background: #0d1f15;
+    color: #00ff88;
+    border: 1px solid #1a3d26;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* ── Status badges ── */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-pending {
+    background: #1f1a0d;
+    color: #ffc107;
+    border: 1px solid #3d3010;
+}
+
+.status-confirmed {
+    background: #0d1f15;
+    color: #00ff88;
+    border: 1px solid #1a3d26;
+}
+
+.status-cancelled {
+    background: #1f0d0d;
+    color: #ff4444;
+    border: 1px solid #3d1a1a;
+}
+
+/* ── Modals ── */
+.modal-content {
+    background: #111 !important;
+    border: 1px solid #222 !important;
+    color: white !important;
+    border-radius: 14px !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid #1a1a1a !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #1a1a1a !important;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+.btn-save-crm {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .btn-save-crm:hover {
+        opacity: 0.85;
+    }
+
+    .btn-save-crm:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+.btn-cancel-crm {
+    background: transparent;
+    color: #555;
+    border: 1px solid #222;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-cancel-crm:hover {
+        border-color: #555;
+        color: #aaa;
+    }
+
+/* ── Alerts ── */
+.alert-crm-error {
+    background: #2a1212;
+    border: 1px solid #4a1f1f;
+    color: #ff8f8f;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.alert-crm-success {
+    background: #0d1f15;
+    border: 1px solid #1a3d26;
+    color: #00ff88;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+/* ── Loading ── */
+.spinner-border {
+    color: #00ff88 !important;
+}
+
+.loading-center {
+    text-align: center;
+    padding: 4rem 0;
+    color: #555;
+}
+
+/* ── Empty state ── */
+.empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: #333;
+}
+
+    .empty-state .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+/* ── Divider ── */
+.divider-crm {
+    border-color: #1a1a1a;
+    margin: 1.5rem 0;
+}
+
+/* ── Search ── */
+.search-input-crm {
+    background: #111;
+    border: 1px solid #222;
+    color: white;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+    .search-input-crm::placeholder {
+        color: #444;
+    }
+
+    .search-input-crm:focus {
+        outline: none;
+        border-color: #00ff88;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1);
+    }
+
+/* ── Pagination ── */
+.page-btn-crm {
+    background: transparent;
+    border: 1px solid #222;
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .page-btn-crm:hover {
+        border-color: #00ff88;
+        color: #00ff88;
+    }
+
+    .page-btn-crm.active {
+        background: #00ff88;
+        color: #0a0a0a;
+        border-color: #00ff88;
+        font-weight: 700;
+    }
+
+    .page-btn-crm:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+/* ── Doctor page specific ── */
+.btn-add {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+    .btn-add:hover {
+        opacity: 0.85;
+        color: #0a0a0a;
+    }
+
+.toggle-label {
+    color: #555;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.alert-dark-error {
+    background: #2a1212;
+    border: 1px solid #4a1f1f;
+    color: #ff8f8f;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.btn-cancel-modal {
+    background: transparent;
+    color: #555;
+    border: 1px solid #222;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-cancel-modal:hover {
+        border-color: #555;
+        color: #aaa;
+    }
+
+.btn-save {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .btn-save:hover {
+        opacity: 0.85;
+    }
+
+    .btn-save:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+/* ── Patient page specific ── */
+.patients-page {
+    padding: 2.5rem 3rem;
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+}
+
+    .page-header h2 {
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+.btn-accent {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+    .btn-accent:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+.search-wrap {
+    margin-bottom: 1.25rem;
+}
+
+.search-input {
+    width: 100%;
+    background: #111;
+    border: 1px solid #222;
+    color: white;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+    .search-input::placeholder {
+        color: #444;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #00ff88;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.12);
+    }
+
+.panel {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+    .panel table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .panel thead th {
+        text-align: left;
+        padding: 0.9rem 1.25rem;
+        color: #555;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 700;
+        border-bottom: 1px solid #222;
+    }
+
+    .panel tbody td {
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid #1a1a1a;
+        color: white;
+    }
+
+    .panel tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .panel tbody tr:hover {
+        background: rgba(0,255,136,0.03);
+    }
+
+.empty-row {
+    text-align: center;
+    color: #555;
+    padding: 2.5rem 0;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid #222;
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 0.35rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+    .btn-ghost.view:hover {
+        border-color: #6ec8ff;
+        color: #6ec8ff;
+    }
+
+    .btn-ghost.edit:hover {
+        border-color: #ffc107;
+        color: #ffc107;
+    }
+
+    .btn-ghost.delete:hover {
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+
+.pagination-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 1.25rem;
+}
+
+.page-btn {
+    background: transparent;
+    border: 1px solid #222;
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .page-btn:hover {
+        border-color: #00ff88;
+        color: #00ff88;
+    }
+
+    .page-btn.active {
+        background: #00ff88;
+        color: #0a0a0a;
+        border-color: #00ff88;
+        font-weight: 700;
+    }
+
+    .page-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .page-btn.text-btn {
+        width: auto;
+        padding: 0 0.9rem;
+    }
+
+/*Patient detail page css code*/
+
+.patient-detail-page {
+    --d-bg: #0a0a0a;
+    --d-panel: #111;
+    --d-border: #222;
+    --d-accent: #00ff88;
+    --d-text: #f2f2f2;
+    --d-muted: #666;
+    background: var(--d-bg);
+    color: var(--d-text);
+    font-family: 'Segoe UI', sans-serif;
+    padding: 2.5rem 3rem;
+    min-height: 100vh;
+    border-radius: 12px;
+}
+
+    .patient-detail-page .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.75rem;
+    }
+
+        .patient-detail-page .page-header h2 {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+
+    .patient-detail-page .btn-back {
+        background: transparent;
+        border: 1px solid var(--d-border);
+        color: var(--d-text);
+        padding: 0.5rem 1.1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: border-color 0.15s, color 0.15s;
+    }
+
+        .patient-detail-page .btn-back:hover {
+            border-color: var(--d-accent);
+            color: var(--d-accent);
+        }
+
+    .patient-detail-page .loading {
+        text-align: center;
+        padding: 4rem 0;
+        color: var(--d-muted);
+    }
+
+    .patient-detail-page .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--d-border);
+        border-top-color: var(--d-accent);
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        animation: spin 0.8s linear infinite;
+    }
+
+@@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.patient-detail-page .panel {
+    background: var(--d-panel);
+    border: 1px solid var(--d-border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.patient-detail-page .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.patient-detail-page .avatar {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: rgba(0,255,136,0.12);
+    color: var(--d-accent);
+    border: 1px solid rgba(0,255,136,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.patient-detail-page .profile-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.4rem;
+}
+
+.patient-detail-page .pill {
+    display: inline-block;
+    background: rgba(0,255,136,0.12);
+    color: var(--d-accent);
+    border: 1px solid rgba(0,255,136,0.3);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.7rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.patient-detail-page .profile-email {
+    color: var(--d-muted);
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0;
+}
+
+.patient-detail-page .btn-edit {
+    margin-left: auto;
+    background: var(--d-accent);
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .patient-detail-page .btn-edit:hover {
+        opacity: 0.9;
+    }
+
+.patient-detail-page .panel-title {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--d-border);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--d-text);
+}
+
+.patient-detail-page .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+}
+
+.patient-detail-page .info-cell {
+    background: var(--d-bg);
+    border: 1px solid var(--d-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+}
+
+.patient-detail-page .info-label {
+    color: var(--d-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.patient-detail-page .info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--d-text);
+}
+
+@@media (max-width: 700px) {
+    .patient-detail-page .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .patient-detail-page .profile-header {
+        flex-wrap: wrap;
+    }
+
+    .patient-detail-page .btn-edit {
+        margin-left: 0;
+    }
+}
+
+/* Appointment index page */
+
+.btn-book {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    display: inline-block;
+}
+
+    .btn-book:hover {
+        opacity: 0.85;
+        color: #0a0a0a;
+    }
+
+.filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid #222;
+    color: #666;
+    padding: 0.4rem 1.1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .filter-btn:hover {
+        border-color: #444;
+        color: #aaa;
+    }
+
+    .filter-btn.active {
+        background: #00ff88;
+        border-color: #00ff88;
+        color: #0a0a0a;
+    }
+
+    .filter-btn.pending.active {
+        background: #ffc107;
+        border-color: #ffc107;
+        color: #0a0a0a;
+    }
+
+    .filter-btn.confirmed.active {
+        background: #00ff88;
+        border-color: #00ff88;
+        color: #0a0a0a;
+    }
+
+    .filter-btn.cancelled.active {
+        background: #ff4444;
+        border-color: #ff4444;
+        color: white;
+    }
+
+.dark-card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.dark-table {
+    color: white;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .dark-table thead th {
+        background: #0d0d0d;
+        color: #555;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .dark-table tbody td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #111;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .dark-table tbody tr:hover {
+        background: #151515;
+    }
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-pending {
+    background: #1f1a0d;
+    color: #ffc107;
+    border: 1px solid #3d3010;
+}
+
+.status-confirmed {
+    background: #0d1f15;
+    color: #00ff88;
+    border: 1px solid #1a3d26;
+}
+
+.status-cancelled {
+    background: #1f0d0d;
+    color: #ff4444;
+    border: 1px solid #3d1a1a;
+}
+
+.btn-action {
+    background: #1a1a1a;
+    color: #aaa;
+    border: 1px solid #222;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.3rem;
+}
+
+    .btn-action.update:hover {
+        border-color: #00ff88;
+        color: #00ff88;
+    }
+
+    .btn-action.cancel:hover {
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+
+.empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: #333;
+}
+
+.modal-content {
+    background: #111 !important;
+    border: 1px solid #222 !important;
+    color: white !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid #1a1a1a !important;
+}
+
+.modal-footer {
+    border-top: 1px solid #1a1a1a !important;
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+.dark-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.dark-select {
+    background: #0a0a0a !important;
+    border: 1px solid #262626 !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+    .dark-select:focus {
+        outline: none;
+        border-color: #00ff88 !important;
+        box-shadow: 0 0 0 3px rgba(0,255,136,0.1) !important;
+    }
+
+    .dark-select option {
+        background: #111;
+    }
+
+.btn-save {
+    background: #00ff88;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .btn-save:hover {
+        opacity: 0.85;
+    }
+
+.btn-cancel-modal {
+    background: transparent;
+    color: #555;
+    border: 1px solid #222;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-cancel-modal:hover {
+        border-color: #555;
+        color: #aaa;
+    }
+
+.btn-cancel-confirm {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+    .btn-cancel-confirm:hover {
+        opacity: 0.85;
+    }
+
+.spinner-border {
+    color: #00ff88 !important;
 }
