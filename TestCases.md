@@ -10,6 +10,9 @@
 | 5 | Duplicate Email Registration | 1. Go to /Account/Register 2. Enter already registered email 3. Click Register | Error message "Email already exists" shown | ✅ Pass |
 | 6 | Protected Route Without Token | 1. Clear localStorage 2. Go to /Home/Index directly | Redirected to /Account/Login automatically | ✅ Pass |
 | 7 | Password Mismatch Registration | 1. Go to /Account/Register 2. Enter different passwords 3. Click Register | Error message "Passwords do not match" shown | ✅ Pass |
+| 8 | Login with empty email | 1. Go to /Account/Login 2. Leave email empty 3. Click Login | Validation error "Email is required" shown | ✅ Pass |
+| 9 | Register with short password | 1. Go to /Account/Register 2. Enter password less than 6 chars 3. Click Register | Error "Password must be at least 6 characters" | ✅ Pass |
+| 10 | Register as Admin role | 1. Go to /Account/Register 2. Select Admin role 3. Register | User created with Admin role, Admin badge shown in navbar | ✅ Pass |
 
 ## Patient Module Test Cases (10)
 | # | Test Case | Steps | Expected Result | Status |
@@ -24,6 +27,8 @@
 | 8 | Edit Patient | 1. Click Edit on a patient 2. Change details 3. Click Save | Patient details updated in list | ✅ Pass |
 | 9 | Delete Patient | 1. Click Delete on a patient 2. Confirm in dialog | Patient removed from list | ✅ Pass |
 | 10 | View Patient Detail | 1. Click View on a patient | Full patient profile shown with age calculation | ✅ Pass |
+| 11 | Search with no results | 1. Go to /Patients 2. Search for non-existent name | "No patients found" empty state shown | ✅ Pass |
+| 12 | Pagination works correctly | 1. Add 21+ patients 2. Go to /Patients | Second page shows remaining patients | ✅ Pass |
 
 ## Doctor Module Test Cases (7)
 | # | Test Case | Steps | Expected Result | Status |
@@ -35,6 +40,7 @@
 | 5 | Reactivate Doctor | 1. Toggle Show Inactive 2. Click Reactivate 3. Confirm | Doctor reappears in active list | ✅ Pass |
 | 6 | Show Inactive Toggle | 1. Toggle Show Inactive switch | Inactive doctors appear in list | ✅ Pass |
 | 7 | Add Doctor with Empty Fields | 1. Click + Add Doctor 2. Leave fields empty 3. Click Save | Validation error shown | ✅ Pass |
+| 8 | Add Doctor with empty fields | 1. Click + Add Doctor 2. Leave all fields empty 3. Click Save | Validation errors shown for each field | ✅ Pass |
 
 ## Appointment Module Test Cases (10)
 | # | Test Case | Steps | Expected Result | Status |
