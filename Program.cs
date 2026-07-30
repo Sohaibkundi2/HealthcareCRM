@@ -1,6 +1,7 @@
 using HealthcareCRM.Services;
 using Microsoft.EntityFrameworkCore;
 using HealthcareCRM.Models;
+using HealthcareCRM.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -18,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseGlobalErrorHandler();
 
 app.UseStaticFiles();
 app.UseSwagger();
