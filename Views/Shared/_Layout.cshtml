@@ -161,6 +161,48 @@
     else if (path.includes('/appointments')) document.getElementById('nav-appointments').classList.add('active');
     else document.getElementById('nav-dashboard').classList.add('active');
 
+    // Global fetch interceptor for error handling
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+        try {
+            const response = await originalFetch(...args);
+            if (response.status === 403) {
+                window.location.href = '/Home/AccessDenied';
+            }
+            return response;
+        } catch (err) {
+            // Network failure — API unreachable
+            console.error('Network error:', err);
+        
+            // Show network error banner if it doesn't exist yet
+            if (!document.getElementById('network-error-banner')) {
+                const banner = document.createElement('div');
+                banner.id = 'network-error-banner';
+                banner.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: #2a1212;
+                    border-bottom: 1px solid #ff4444;
+                    color: #ff8f8f;
+                    text-align: center;
+                    padding: 0.75rem;
+                    font-size: 0.85rem;
+                    z-index: 9999;
+                `;
+                banner.textContent = '⚠️ Could not connect to server. Please check your connection and try again.';
+                document.body.prepend(banner);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    banner.remove();
+                }, 5000);
+            }
+            throw err;
+        }
+    };
+
     async function logout() {
         try {
             await fetch('/api/auth/logout', {
