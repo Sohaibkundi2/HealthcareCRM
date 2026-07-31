@@ -312,9 +312,15 @@
                 currentPage--;
             }
             loadPatients();
-        } else {
+        } else if (response.status !== 403) {
+            // 403 handled by global fetch interceptor in _Layout
             const result = await response.json();
-            alert(result.message || 'Failed to delete patient');
+            document.getElementById('patients-table').innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#ff6b6b; padding:2rem;">
+                        ${result.message || 'Failed to delete patient'}
+                    </td>
+                </tr>`;
         }
     }
 </script>
