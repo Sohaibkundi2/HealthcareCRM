@@ -11,7 +11,12 @@
             </svg>
             Patients
         </h2>
-        <button class="btn-accent" onclick="showAddForm()">+ Add Patient</button>
+        <div class="d-flex gap-2 align-items-center">
+            <button id="export-btn" class="btn-export d-none" onclick="exportCSV()">
+                ⬇ Export CSV
+            </button>
+            <button class="btn-accent" onclick="showAddForm()">+ Add Patient</button>
+        </div>
     </div>
 
     <div class="search-wrap">
@@ -118,6 +123,33 @@
 <script>
     if (!token) window.location.href = '/Account/Login';
 
+
+        // Show export button only for Admin
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        if (role === 'Admin') {
+            document.getElementById('export-btn').classList.remove('d-none');
+        }
+    } catch (e) {}
+
+    async function exportCSV() {
+        const response = await fetch('/api/patients/export?format=csv', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `patients_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    }
     const PAGE_SIZE = 20;
 
     let currentSearch = '';

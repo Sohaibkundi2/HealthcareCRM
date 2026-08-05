@@ -3,6 +3,10 @@ using HealthcareCRM.Models;
 using HealthcareCRM.Services;
 using HealthcareCRM.Helpers;
 
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
+
 namespace HealthcareCRM.Controllers
 {
     [ApiController]
@@ -37,6 +41,50 @@ namespace HealthcareCRM.Controllers
                 pageSize = result.PageSize,
                 totalPages = result.TotalPages
             });
+        }
+
+
+        // GET /api/patients/export?format=csv
+        [HttpGet("export")]
+        [RequireRole("Admin")]
+        public async Task<IActionResult> Export([FromQuery] string format = "csv")
+        {
+            var patients = await _patientService.GetAllPatientsForExport();
+
+            if (format.ToLower() == "csv")
+            {
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture));
+
+                // Write header
+                csv.WriteHeader<PatientExportDto>();
+                await csv.NextRecordAsync();
+
+                // Write records
+                foreach (var patient in patients)
+                {
+                    csv.WriteRecord(new PatientExportDto
+                    {
+                        Id = patient.Id,
+                        FullName = patient.FullName,
+                        Email = patient.Email,
+                        Phone = patient.Phone,
+                        Gender = patient.Gender,
+                        DateOfBirth = patient.DateOfBirth.ToString("yyyy-MM-dd"),
+                        Address = patient.Address,
+                        RegisteredOn = patient.CreatedAt.ToString("yyyy-MM-dd")
+                    });
+                    await csv.NextRecordAsync();
+                }
+
+                await writer.FlushAsync();
+                stream.Position = 0;
+
+                return File(stream, "text/csv", $"patients_{DateTime.UtcNow:yyyyMMdd}.csv");
+            }
+
+            return BadRequest(new { success = false, message = "Unsupported format. Use format=csv" });
         }
 
         // GET /api/patients/{id}
