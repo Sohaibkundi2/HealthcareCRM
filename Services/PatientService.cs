@@ -100,5 +100,13 @@ namespace HealthcareCRM.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        // Get all patients for export (no pagination)
+        public async Task<List<Patient>> GetAllPatientsForExport()
+        {
+            return await _context.Patients
+                .OrderBy(p => p.FullName)
+                .ToListAsync();
+        }
     }
 }

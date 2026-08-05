@@ -2245,3 +2245,24 @@ footer {
         display: none;
     }
 }
+
+/* ── Export button ── */
+.btn-export {
+    background: transparent;
+    border: 1px solid #00ff88;
+    color: #00ff88;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+    .btn-export:hover {
+        background: #00ff88;
+        color: #0a0a0a;
+    }
