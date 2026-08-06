@@ -12,6 +12,17 @@ namespace HealthcareCRM.Services
             _context = context;
         }
 
+        public async Task<List<Appointment>> GetAppointmentsByDateRange(DateTime from, DateTime to)
+        {
+            return await _context.Appointments
+                .Include(a => a.Patient)
+                .Include(a => a.Doctor)
+                .Where(a => a.AppointmentDate.Date >= from.Date &&
+                            a.AppointmentDate.Date <= to.Date)
+                .OrderByDescending(a => a.AppointmentDate)
+                .ToListAsync();
+        }
+
         // Get all appointments with patient and doctor info
         public async Task<List<Appointment>> GetAllAppointments(string? status = null)
         {
