@@ -4,10 +4,16 @@
 
 <div class="container py-4">
 
-    <!-- Header -->
+    <!-- Header with Export -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="page-title mb-0">Appointments</h2>
-        <a href="/Appointments/Book" class="btn-book">+ Book Appointment</a>
+        <div class="d-flex gap-2 align-items-center">
+            <!-- PDF Export (Admin only) -->
+            <button id="export-pdf-btn" class="btn-export d-none" onclick="exportPDF()">
+                ⬇ Export PDF
+            </button>
+            <a href="/Appointments/Book" class="btn-book">+ Book Appointment</a>
+        </div>
     </div>
 
     <!-- Filter -->
@@ -90,6 +96,50 @@
 <script>
     if (!token) window.location.href = '/Account/Login';
 
+    // ----- Role check to show PDF export button -----
+    (function showExportForAdmin() {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+            if (role === 'Admin') {
+                document.getElementById('export-pdf-btn').classList.remove('d-none');
+            }
+        } catch (e) {
+            // Ignore
+        }
+    })();
+
+    // ----- Export helpers (copied from patient page) -----
+    function downloadBlob(blob, filename) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
+    function todayStamp() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    // ----- PDF Export (calls backend /api/appointments/report) -----
+    async function exportPDF() {
+        const response = await fetch('/api/appointments/report', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            downloadBlob(await response.blob(), `appointments_report_${todayStamp()}.pdf`);
+        } else if (response.status !== 403) {
+            const result = await response.json().catch(() => ({}));
+            alert(result.message || 'Failed to generate report');
+        }
+    }
+
+    // ----- Existing JavaScript (unchanged) -----
     let currentStatus = '';
     let cancelTargetId = null;
 
