@@ -2260,3 +2260,115 @@ footer {
         background: #00ff88;
         color: #0a0a0a;
     }
+
+/*home page icons*/
+
+/* ── Stat icon ── */
+.stat-icon-crm {
+    font-size: 2rem;
+    color: #00ff88;
+}
+
+
+/* ── Navbar ── */
+.navbar-crm {
+    background: #0a0a0a;
+    padding: 0.9rem 2rem;
+    border-bottom: 1px solid #1a1a1a;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-brand-crm {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: white !important;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+    .navbar-brand-crm span {
+        color: #00ff88;
+    }
+
+.nav-link-crm {
+    color: #888 !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+}
+
+    .nav-link-crm:hover {
+        color: white !important;
+        background: #1a1a1a;
+    }
+
+    .nav-link-crm.active {
+        color: #00ff88 !important;
+        background: #0d1f15;
+    }
+
+.btn-logout {
+    background: transparent;
+    border: 1px solid #333;
+    color: #888;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+    .btn-logout:hover {
+        border-color: #ff4444;
+        color: #ff4444;
+    }
+
+.user-badge {
+    background: #0d1f15;
+    border: 1px solid #1a3d26;
+    color: #00ff88;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-badge-admin {
+    background: #1f0a00;
+    border: 1px solid #ff6600;
+    color: #ff6600;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-badge-staff {
+    background: #0d1f15;
+    border: 1px solid #1a3d26;
+    color: #00ff88;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* ── Network error banner ── */
+.network-error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #2a1212;
+    border-bottom: 1px solid #ff4444;
+    color: #ff8f8f;
+    text-align: center;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+    z-index: 9999;
+}

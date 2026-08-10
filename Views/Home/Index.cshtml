@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <p class="mb-0" style="font-size: 0.85rem; color: #555;">Good day 👋</p>
+            <p class="mb-0 text-muted-crm" style="font-size: 0.85rem;">Good day</p>
             <h2 class="page-title fw-bold mb-0" id="welcome-msg">Dashboard</h2>
         </div>
         <div class="date-badge" id="current-date"></div>
@@ -25,7 +25,7 @@
                         <div class="stat-number" id="stat-patients">—</div>
                         <a href="/Patients" class="stat-link">View all →</a>
                     </div>
-                    <div class="stat-icon">👥</div>
+                    <i class="bi bi-people stat-icon-crm"></i>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
                         <div class="stat-number" id="stat-doctors">—</div>
                         <a href="/Doctors" class="stat-link">View all →</a>
                     </div>
-                    <div class="stat-icon">👨‍⚕️</div>
+                    <i class="bi bi-person-badge stat-icon-crm"></i>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
                         <div class="stat-number" id="stat-today">—</div>
                         <a href="/Appointments" class="stat-link">View all →</a>
                     </div>
-                    <div class="stat-icon">📅</div>
+                    <i class="bi bi-calendar-check stat-icon-crm"></i>
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
                         <div class="stat-number" id="stat-pending">—</div>
                         <a href="/Appointments" class="stat-link">View all →</a>
                     </div>
-                    <div class="stat-icon">⏳</div>
+                    <i class="bi bi-hourglass-split stat-icon-crm"></i>
                 </div>
             </div>
         </div>
@@ -69,27 +69,21 @@
 
     <!-- Chart + Recent -->
     <div class="row g-3 mb-4">
-
-        <!-- Chart -->
         <div class="col-md-5">
             <div class="chart-wrap h-100">
                 <div class="section-title">Appointment Status</div>
                 <canvas id="statusChart"></canvas>
             </div>
         </div>
-
-        <!-- Recent Appointments -->
         <div class="col-md-7">
             <div class="dark-card h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="section-title mb-0">Recent Appointments</div>
                     <a href="/Appointments" class="stat-link">View all →</a>
                 </div>
-
                 <div id="recent-loading" class="text-center py-3">
                     <div class="spinner-border spinner-border-sm"></div>
                 </div>
-
                 <table class="dark-table d-none" id="recent-table">
                     <thead>
                         <tr>
@@ -101,8 +95,7 @@
                     </thead>
                     <tbody id="recent-tbody"></tbody>
                 </table>
-
-                <div id="recent-empty" class="text-center py-3 d-none" style="color:#555;">
+                <div id="recent-empty" class="text-center py-3 d-none text-muted-crm">
                     No appointments yet.
                 </div>
             </div>
@@ -116,7 +109,7 @@
             <a href="/Patients" class="quick-action">+ Add Patient</a>
             <a href="/Doctors" class="quick-action">+ Add Doctor</a>
             <a href="/Appointments/Book" class="quick-action">+ Book Appointment</a>
-            <a href="/swagger" target="_blank" class="quick-action">📖 API Docs</a>
+            <a href="/swagger" target="_blank" class="quick-action">API Docs</a>
         </div>
     </div>
 </div>
@@ -125,12 +118,10 @@
 <script>
     if (!token) window.location.href = '/Account/Login';
 
-    // Set date
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // Decode name from JWT
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const name = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
@@ -142,7 +133,6 @@
 
     async function loadDashboard() {
         try {
-            // Load stats from dedicated endpoint
             const statsRes = await fetch('/api/dashboard/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -154,7 +144,6 @@
             document.getElementById('stat-today').textContent = s.appointmentsToday;
             document.getElementById('stat-pending').textContent = s.pendingCount;
 
-            // Chart
             const ctx = document.getElementById('statusChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
@@ -179,7 +168,6 @@
                 }
             });
 
-            // Recent appointments
             const aRes = await fetch('/api/appointments', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -198,8 +186,8 @@
             document.getElementById('recent-tbody').innerHTML = recent.map(a => `
                 <tr>
                     <td>${a.patient?.fullName || '—'}</td>
-                    <td style="color:#888;">${a.doctor?.name || '—'}</td>
-                    <td style="color:#888;">${new Date(a.appointmentDate).toLocaleDateString()}</td>
+                    <td class="text-muted-crm">${a.doctor?.name || '—'}</td>
+                    <td class="text-muted-crm">${new Date(a.appointmentDate).toLocaleDateString()}</td>
                     <td>
                         <span class="status-badge ${
                             a.status === 'Confirmed' ? 'status-confirmed' :
