@@ -27,6 +27,7 @@ namespace HealthcareCRM.Controllers
                     u.FullName,
                     u.Email,
                     u.Role,
+                    u.IsActive,
                     u.CreatedAt
                 })
                 .ToList();
@@ -50,6 +51,25 @@ namespace HealthcareCRM.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Role updated successfully" });
+        }
+
+        // PUT /api/admin/users/{id}/toggle-active
+        [HttpPut("users/{id}/toggle-active")]
+        public async Task<IActionResult> ToggleActive(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+                return NotFound(new { success = false, message = "User not found" });
+
+            user.IsActive = !user.IsActive;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                success = true,
+                message = user.IsActive ? "User activated successfully" : "User deactivated successfully",
+                isActive = user.IsActive
+            });
         }
     }
 

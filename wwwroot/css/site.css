@@ -2372,3 +2372,14 @@ footer {
     font-size: 0.85rem;
     z-index: 9999;
 }
+
+/* ── Admin page icons ── */
+.icon-danger {
+    font-size: 3rem;
+    color: #ff4444;
+}
+
+.icon-accent {
+    font-size: 1.5rem;
+    color: #00ff88;
+}
