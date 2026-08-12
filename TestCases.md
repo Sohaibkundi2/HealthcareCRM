@@ -1,6 +1,6 @@
 # Healthcare CRM — Test Cases
 
-## Auth Feature Test Cases (7)
+## Auth Feature Test Cases (10)
 | # | Test Case | Steps | Expected Result | Status |
 |---|-----------|-------|----------------|--------|
 | 1 | Valid Login | 1. Go to /Account/Login 2. Enter valid email and password 3. Click Login | JWT stored in localStorage, redirected to dashboard | ✅ Pass |
@@ -14,7 +14,7 @@
 | 9 | Register with short password | 1. Go to /Account/Register 2. Enter password less than 6 chars 3. Click Register | Error "Password must be at least 6 characters" | ✅ Pass |
 | 10 | Register as Admin role | 1. Go to /Account/Register 2. Select Admin role 3. Register | User created with Admin role, Admin badge shown in navbar | ✅ Pass |
 
-## Patient Module Test Cases (10)
+## Patient Module Test Cases (12)
 | # | Test Case | Steps | Expected Result | Status |
 |---|-----------|-------|----------------|--------|
 | 1 | View Patient List | 1. Login 2. Go to /Patients | All patients shown in paginated table | ✅ Pass |
@@ -30,7 +30,7 @@
 | 11 | Search with no results | 1. Go to /Patients 2. Search for non-existent name | "No patients found" empty state shown | ✅ Pass |
 | 12 | Pagination works correctly | 1. Add 21+ patients 2. Go to /Patients | Second page shows remaining patients | ✅ Pass |
 
-## Doctor Module Test Cases (7)
+## Doctor Module Test Cases (8)
 | # | Test Case | Steps | Expected Result | Status |
 |---|-----------|-------|----------------|--------|
 | 1 | View Doctor List | 1. Login 2. Go to /Doctors | All active doctors shown in table | ✅ Pass |
@@ -80,3 +80,26 @@
 | 8 | Admin can delete patient | 1. Login as Admin 2. Call DELETE /api/patients/1 in Postman with Admin token | Patient deleted successfully | ✅ Pass |
 | 9 | Admin can change user role | 1. Login as Admin 2. Go to /Admin/Users 3. Change Staff to Admin | Role updated, badge changes on next login | ✅ Pass |
 | 10 | Invalid token blocked | 1. Call GET /api/admin/users with invalid token | Returns 401 Unauthorized | ✅ Pass |
+
+## Export Test Cases (5)
+
+| # | Test Case | Steps | Expected Result | Status |
+|---|-----------|-------|----------------|--------|
+| 1 | Export patients as CSV (Admin) | 1. Login as Admin 2. Go to /Patients 3. Click Export CSV | CSV file downloads with all patient data | ✅ Pass |
+| 2 | Export button hidden for Staff | 1. Login as Staff 2. Go to /Patients | Export CSV button not visible | ✅ Pass |
+| 3 | Export CSV via Postman (Admin) | 1. Call GET /api/patients/export?format=csv with Admin token | CSV file returned with correct headers | ✅ Pass |
+| 4 | Export CSV blocked for Staff | 1. Call GET /api/patients/export?format=csv with Staff token | Returns 403 Forbidden | ✅ Pass |
+| 5 | PDF report via Postman (Admin) | 1. Call GET /api/appointments/report?from=2026-01-01&to=2026-12-31 with Admin token | PDF file downloaded with appointment data | ✅ Pass |
+
+## User Management Test Cases (8)
+
+| # | Test Case | Steps | Expected Result | Status |
+|---|-----------|-------|----------------|--------|
+| 1 | View all users (Admin) | 1. Login as Admin 2. Go to /Admin/Users | All users shown with role and status | ✅ Pass |
+| 2 | Change user role to Admin | 1. Login as Admin 2. Click Change Role 3. Select Admin 4. Update | Role badge updates to Admin | ✅ Pass |
+| 3 | Change user role to Staff | 1. Login as Admin 2. Click Change Role 3. Select Staff 4. Update | Role badge updates to Staff | ✅ Pass |
+| 4 | Deactivate user | 1. Login as Admin 2. Click Deactivate 3. Confirm | Status badge changes to Inactive | ✅ Pass |
+| 5 | Activate user | 1. Login as Admin 2. Click Activate 3. Confirm | Status badge changes to Active | ✅ Pass |
+| 6 | Deactivated user cannot login | 1. Deactivate a user 2. Try to login as that user | Error "Your account has been deactivated" | ✅ Pass |
+| 7 | Audit log records role change | 1. Change a user role 2. Go to /Admin/AuditLog | ROLE_CHANGE entry shown with details | ✅ Pass |
+| 8 | Audit log records activation | 1. Deactivate a user 2. Go to /Admin/AuditLog | USER_DEACTIVATED entry shown with details | ✅ Pass |
