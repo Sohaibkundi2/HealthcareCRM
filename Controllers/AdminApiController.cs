@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using HealthcareCRM.Models;
 using HealthcareCRM.Helpers;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace HealthcareCRM.Controllers
 {
@@ -14,6 +16,30 @@ namespace HealthcareCRM.Controllers
         public AdminApiController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private string GetCurrentUserEmail()
+        {
+            var authHeader = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrWhiteSpace(authHeader)) return "Unknown";
+            var token = authHeader.Substring("Bearer ".Length);
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+            return jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "Unknown";
+        }
+
+        private async Task LogAction(string action, string targetType, int targetId, string details)
+        {
+            _context.AuditLogs.Add(new AuditLog
+            {
+                Action = action,
+                TargetType = targetType,
+                TargetId = targetId,
+                PerformedBy = GetCurrentUserEmail(),
+                Details = details,
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
         }
 
         // GET /api/admin/users
@@ -47,8 +73,12 @@ namespace HealthcareCRM.Controllers
             if (user == null)
                 return NotFound(new { success = false, message = "User not found" });
 
+            var oldRole = user.Role;
             user.Role = request.Role;
             await _context.SaveChangesAsync();
+
+            await LogAction("ROLE_CHANGE", "User", id,
+                $"Role changed from {oldRole} to {request.Role} for {user.Email}");
 
             return Ok(new { success = true, message = "Role updated successfully" });
         }
@@ -64,12 +94,39 @@ namespace HealthcareCRM.Controllers
             user.IsActive = !user.IsActive;
             await _context.SaveChangesAsync();
 
+            await LogAction(
+                user.IsActive ? "USER_ACTIVATED" : "USER_DEACTIVATED",
+                "User", id,
+                $"{user.Email} was {(user.IsActive ? "activated" : "deactivated")}");
+
             return Ok(new
             {
                 success = true,
                 message = user.IsActive ? "User activated successfully" : "User deactivated successfully",
                 isActive = user.IsActive
             });
+        }
+
+        // GET /api/admin/audit-log
+        [HttpGet("audit-log")]
+        public IActionResult GetAuditLog()
+        {
+            var logs = _context.AuditLogs
+                .OrderByDescending(a => a.CreatedAt)
+                .Take(100)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Action,
+                    a.TargetType,
+                    a.TargetId,
+                    a.PerformedBy,
+                    a.Details,
+                    a.CreatedAt
+                })
+                .ToList();
+
+            return Ok(new { success = true, data = logs });
         }
     }
 
