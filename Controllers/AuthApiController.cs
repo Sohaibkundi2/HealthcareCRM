@@ -27,6 +27,10 @@ namespace HealthcareCRM.Controllers
             if (user == null)
                 return Unauthorized(new { message = "Invalid email or password" });
 
+            // Check if user is active
+            if (!user.IsActive)
+                return Unauthorized(new { message = "Your account has been deactivated. Please contact admin." });
+
             bool isPasswordValid = _authService.VerifyPassword(model.Password, user.PasswordHash);
 
             if (!isPasswordValid)

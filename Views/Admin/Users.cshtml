@@ -4,12 +4,16 @@
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="page-title mb-0">⚙️ User Management</h2>
-        <span style="color:#555; font-size:0.85rem;">Admin only</span>
+        <h2 class="page-title mb-0">
+            <i class="bi bi-gear icon-accent me-2"></i>User Management
+        </h2>
+        <a href="/Admin/AuditLog" class="btn-ghost-crm">
+            <i class="bi bi-journal-text me-1"></i>Audit Log
+        </a>
     </div>
 
     <div id="access-denied" class="access-denied d-none">
-        <div>🔒</div>
+        <i class="bi bi-shield-lock icon-danger"></i>
         <p>Access Denied — Admin only</p>
         <a href="/Home/Index" style="color:#00ff88;">← Back to Dashboard</a>
     </div>
@@ -27,6 +31,7 @@
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -54,6 +59,25 @@
             <div class="modal-footer">
                 <button class="btn-cancel-modal" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn-save" onclick="confirmRoleChange()">Update Role</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Active Confirm Modal -->
+<div class="modal fade" id="toggleActiveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="toggle-active-title">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="toggle-active-body" style="color:#aaa;">
+                Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel-modal" data-bs-dismiss="modal">Cancel</button>
+                <button id="toggle-active-btn" class="btn-save" onclick="confirmToggleActive()">Confirm</button>
             </div>
         </div>
     </div>
@@ -111,7 +135,19 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn-action" onclick="showRoleModal(${u.id}, '${u.role}')">Change Role</button>
+                        <span class="${u.isActive ? 'badge-active' : 'badge-inactive'}">
+                            ${u.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-action me-1" onclick="showRoleModal(${u.id}, '${u.role}')">Change Role</button>
+                        <button class="btn-action ${u.isActive ? 'danger' : ''}"
+                            data-id="${u.id}"
+                            data-active="${u.isActive}"
+                            data-name="${escapeHtml(u.fullName)}"
+                            onclick="handleToggleActive(this)">
+                            ${u.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -153,4 +189,51 @@
             alert('Something went wrong');
         }
     }
+
+    let toggleActiveTargetId = null;
+    let toggleActiveIsActive = false;
+
+    function toggleActive(id, isActive, name) {
+        toggleActiveTargetId = id;
+        toggleActiveIsActive = isActive;
+        document.getElementById('toggle-active-title').textContent = isActive ? 'Deactivate User' : 'Activate User';
+        document.getElementById('toggle-active-body').textContent = isActive
+            ? `Are you sure you want to deactivate ${name}? They will not be able to login.`
+            : `Are you sure you want to activate ${name}?`;
+        const btn = document.getElementById('toggle-active-btn');
+        btn.style.background = isActive ? '#ff4444' : '#00ff88';
+        btn.style.color = '#0a0a0a';
+        btn.textContent = isActive ? 'Deactivate' : 'Activate';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('toggleActiveModal')).show();
+    }
+
+    async function confirmToggleActive() {
+        if (!toggleActiveTargetId) return;
+
+        try {
+            const response = await fetch(`/api/admin/users/${toggleActiveTargetId}/toggle-active`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('toggleActiveModal')).hide();
+
+            if (response.ok) {
+                toggleActiveTargetId = null;
+                loadUsers();
+            } else {
+                const result = await response.json();
+                alert(result.message || 'Failed to update user status');
+            }
+        } catch (err) {
+            alert('Something went wrong');
+        }
+    }
+
+    function handleToggleActive(btn) {
+    const id = parseInt(btn.dataset.id);
+    const isActive = btn.dataset.active === 'true';
+    const name = btn.dataset.name;
+    toggleActive(id, isActive, name);
+}
 </script>

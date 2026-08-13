@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title mb-0">
+            <i class="bi bi-journal-text icon-accent me-2"></i>Audit Log
+        </h2>
+        <a href="/Admin/Users" class="btn-back-crm">← Back to Users</a>
+    </div>
+
+    <div id="access-denied" class="access-denied d-none">
+        <i class="bi bi-shield-lock icon-danger"></i>
+        <p>Access Denied — Admin only</p>
+        <a href="/Home/Index" class="stat-link">← Back to Dashboard</a>
+    </div>
+
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-2 text-muted-crm">Loading audit log...</p>
+    </div>
+
+    <div class="dark-card-table d-none" id="audit-card">
+        <table class="dark-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Performed By</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+            <tbody id="audit-table"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state d-none">
+            No audit logs found.
+        </div>
+    </div>
+</div>
+
+<script>
+    if (!token) window.location.href = '/Account/Login';
+
+    let userRole = 'Staff';
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        userRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 'Staff';
+    } catch (e) {}
+
+    if (userRole !== 'Admin') {
+        document.getElementById('loading').classList.add('d-none');
+        document.getElementById('access-denied').classList.remove('d-none');
+    } else {
+        loadAuditLog();
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(text || ''));
+        return div.innerHTML;
+    }
+
+    function getActionBadge(action) {
+        const map = {
+            'ROLE_CHANGE': 'status-pending',
+            'USER_ACTIVATED': 'status-confirmed',
+            'USER_DEACTIVATED': 'status-cancelled'
+        };
+        return `<span class="status-badge ${map[action] || ''}">${action.replace('_', ' ')}</span>`;
+    }
+
+    async function loadAuditLog() {
+        try {
+            const response = await fetch('/api/admin/audit-log', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.status === 403) {
+                document.getElementById('loading').classList.add('d-none');
+                document.getElementById('access-denied').classList.remove('d-none');
+                return;
+            }
+
+            const result = await response.json();
+
+            document.getElementById('loading').classList.add('d-none');
+            document.getElementById('audit-card').classList.remove('d-none');
+
+            if (!result.data || result.data.length === 0) {
+                document.getElementById('empty-state').classList.remove('d-none');
+                return;
+            }
+
+            document.getElementById('audit-table').innerHTML = result.data.map((log, i) => `
+                <tr>
+                    <td style="color:#555;">${i + 1}</td>
+                    <td>${getActionBadge(log.action)}</td>
+                    <td style="color:#aaa;">${escapeHtml(log.details)}</td>
+                    <td style="color:#888;">${escapeHtml(log.performedBy)}</td>
+                    <td style="color:#555;">${new Date(log.createdAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+        } catch (err) {
+            document.getElementById('loading').innerHTML =
+                '<p style="color:#ff6b6b; text-align:center;">Failed to load audit log.</p>';
+        }
+    }
+</script>

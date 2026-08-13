@@ -10,5 +10,11 @@ namespace HealthcareCRM.Controllers
         {
             return View();
         }
+
+        // GET: /Admin/AuditLog
+        public IActionResult AuditLog()
+        {
+            return View();
+        }
     }
 }
