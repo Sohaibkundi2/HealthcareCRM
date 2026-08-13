@@ -49,7 +49,7 @@ namespace HealthcareCRM.Services
                 FullName = model.FullName,
                 Email = model.Email,
                 PasswordHash = HashPassword(model.Password),
-                Role = string.IsNullOrWhiteSpace(model.Role) ? "Staff" : model.Role,
+                Role = "Staff",
                 CreatedAt = DateTime.UtcNow
             };
 

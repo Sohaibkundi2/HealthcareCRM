@@ -102,4 +102,4 @@
 | 5 | Activate user | 1. Login as Admin 2. Click Activate 3. Confirm | Status badge changes to Active | ✅ Pass |
 | 6 | Deactivated user cannot login | 1. Deactivate a user 2. Try to login as that user | Error "Your account has been deactivated" | ✅ Pass |
 | 7 | Audit log records role change | 1. Change a user role 2. Go to /Admin/AuditLog | ROLE_CHANGE entry shown with details | ✅ Pass |
-| 8 | Audit log records activation | 1. Deactivate a user 2. Go to /Admin/AuditLog | USER_DEACTIVATED entry shown with details | ✅ Pass |
+| 8 | Audit log records deactivation | 1. Deactivate a user 2. Go to /Admin/AuditLog | USER_DEACTIVATED entry shown with details | ✅ Pass |

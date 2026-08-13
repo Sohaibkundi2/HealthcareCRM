@@ -141,8 +141,11 @@
                     </td>
                     <td>
                         <button class="btn-action me-1" onclick="showRoleModal(${u.id}, '${u.role}')">Change Role</button>
-                        <button class="btn-action ${u.isActive ? 'danger' : ''}" 
-                            onclick="toggleActive(${u.id}, ${u.isActive}, '${escapeHtml(u.fullName)}')">
+                        <button class="btn-action ${u.isActive ? 'danger' : ''}"
+                            data-id="${u.id}"
+                            data-active="${u.isActive}"
+                            data-name="${escapeHtml(u.fullName)}"
+                            onclick="handleToggleActive(this)">
                             ${u.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                     </td>
@@ -226,4 +229,11 @@
             alert('Something went wrong');
         }
     }
+
+    function handleToggleActive(btn) {
+    const id = parseInt(btn.dataset.id);
+    const isActive = btn.dataset.active === 'true';
+    const name = btn.dataset.name;
+    toggleActive(id, isActive, name);
+}
 </script>

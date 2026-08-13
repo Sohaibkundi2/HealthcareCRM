@@ -25,21 +25,8 @@ namespace HealthcareCRM.Controllers
             var token = authHeader.Substring("Bearer ".Length);
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
-            return jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "Unknown";
-        }
-
-        private async Task LogAction(string action, string targetType, int targetId, string details)
-        {
-            _context.AuditLogs.Add(new AuditLog
-            {
-                Action = action,
-                TargetType = targetType,
-                TargetId = targetId,
-                PerformedBy = GetCurrentUserEmail(),
-                Details = details,
-                CreatedAt = DateTime.UtcNow
-            });
-            await _context.SaveChangesAsync();
+            return jwt.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "Unknown";
         }
 
         // GET /api/admin/users
@@ -75,10 +62,19 @@ namespace HealthcareCRM.Controllers
 
             var oldRole = user.Role;
             user.Role = request.Role;
-            await _context.SaveChangesAsync();
 
-            await LogAction("ROLE_CHANGE", "User", id,
-                $"Role changed from {oldRole} to {request.Role} for {user.Email}");
+            // Atomic — save role change and audit log together
+            _context.AuditLogs.Add(new AuditLog
+            {
+                Action = "ROLE_CHANGE",
+                TargetType = "User",
+                TargetId = id,
+                PerformedBy = GetCurrentUserEmail(),
+                Details = $"Role changed from {oldRole} to {request.Role} for {user.Email}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
 
             return Ok(new { success = true, message = "Role updated successfully" });
         }
@@ -92,12 +88,19 @@ namespace HealthcareCRM.Controllers
                 return NotFound(new { success = false, message = "User not found" });
 
             user.IsActive = !user.IsActive;
-            await _context.SaveChangesAsync();
 
-            await LogAction(
-                user.IsActive ? "USER_ACTIVATED" : "USER_DEACTIVATED",
-                "User", id,
-                $"{user.Email} was {(user.IsActive ? "activated" : "deactivated")}");
+            // Atomic — save status change and audit log together
+            _context.AuditLogs.Add(new AuditLog
+            {
+                Action = user.IsActive ? "USER_ACTIVATED" : "USER_DEACTIVATED",
+                TargetType = "User",
+                TargetId = id,
+                PerformedBy = GetCurrentUserEmail(),
+                Details = $"{user.Email} was {(user.IsActive ? "activated" : "deactivated")}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {

@@ -148,7 +148,7 @@ http://localhost:5240/swagger
 
 ## Test Cases
 
-65 manual test cases covering:
+68 manual test cases covering:
 - Auth (10) — login, register, RBAC
 - Patients (12) — CRUD, search, pagination
 - Doctors (8) — CRUD, soft delete

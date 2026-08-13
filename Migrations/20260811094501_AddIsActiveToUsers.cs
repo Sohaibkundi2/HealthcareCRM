@@ -15,7 +15,7 @@ namespace HealthcareCRM.Migrations
                 table: "Users",
                 type: "bit",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
         }
 
         /// <inheritdoc />
