@@ -1804,6 +1804,7 @@ body {
 
 
 /* ── Landing Page ── */
+
 nav {
     padding: 1.5rem 3rem;
     display: flex;
@@ -1879,6 +1880,7 @@ nav {
         color: #0a0a0a;
     }
 
+/* Hero */
 .hero {
     min-height: 100vh;
     display: flex;
@@ -1930,21 +1932,6 @@ nav {
     z-index: 1;
 }
 
-.tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: #111;
-    border: 1px solid #222;
-    color: #00ff88;
-    padding: 0.4rem 1rem;
-    border-radius: 100px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-}
 
 .heartbeat-icon {
     width: 18px;
@@ -2062,6 +2049,7 @@ nav {
     }
 }
 
+/* Stats */
 .stats-bar {
     border-top: 1px solid #111;
     border-bottom: 1px solid #111;
@@ -2088,6 +2076,7 @@ nav {
     margin-top: 0.3rem;
 }
 
+/* Features */
 .features {
     padding: 8rem 3rem;
     background: #0a0a0a;
@@ -2111,8 +2100,7 @@ nav {
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: #111;
+    gap: 1rem;
     border: 1px solid #111;
     border-radius: 16px;
     overflow: hidden;
@@ -2121,12 +2109,14 @@ nav {
 
 .feature-item {
     background: #0a0a0a;
+    border: 1px solid #0a0a0a;
     padding: 2.5rem;
     transition: background 0.2s;
 }
 
     .feature-item:hover {
         background: #111;
+        border-color: #00ff88;
     }
 
 .feature-number {
@@ -2163,6 +2153,53 @@ nav {
     line-height: 1.6;
 }
 
+/* Why section */
+.why-section {
+    padding: 8rem 3rem;
+    background: #050505;
+    border-top: 1px solid #111;
+}
+
+.why-card {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 1.75rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+    height: 100%;
+}
+
+    .why-card:hover {
+        border-color: #00ff88;
+    }
+
+.why-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #00ff88;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.why-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.why-desc {
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* CTA */
 .cta {
     padding: 6rem 3rem 8rem;
     text-align: center;
@@ -2205,17 +2242,91 @@ nav {
     font-size: 1rem;
 }
 
-footer {
-    padding: 2rem 3rem;
+/* Landing Footer */
+.landing-footer {
+    background: #050505;
     border-top: 1px solid #111;
+    padding: 4rem 0 2rem;
+}
+
+.footer-logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+    .footer-logo span {
+        color: #00ff88;
+    }
+
+.footer-desc {
+    color: #555;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.footer-heading {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+    .footer-links a {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color 0.2s;
+    }
+
+        .footer-links a:hover {
+            color: #00ff88;
+        }
+
+.footer-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #00ff88;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.75rem;
+    transition: opacity 0.2s;
+}
+
+    .footer-github:hover {
+        opacity: 0.8;
+        color: #00ff88;
+    }
+
+.footer-bottom {
+    border-top: 1px solid #111;
+    padding-top: 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #333;
-    font-size: 0.85rem;
-    background: #0a0a0a;
+    color: #555;
+    font-size: 0.8rem;
 }
 
+/* Responsive */
 @media (max-width: 860px) {
     .feature-grid {
         grid-template-columns: 1fr;
@@ -2223,6 +2334,22 @@ footer {
 
     .hero-pulse-wrap {
         opacity: 0.6;
+    }
+
+    .why-section {
+        padding: 4rem 1.5rem;
+    }
+
+    .features {
+        padding: 4rem 1.5rem;
+    }
+
+    nav {
+        padding: 1rem 1.5rem;
+    }
+
+    .hero {
+        padding: 6rem 1.5rem 3rem;
     }
 }
 
@@ -2239,7 +2366,6 @@ footer {
         display: none;
     }
 }
-
 /* ── Export button ── */
 .btn-export {
     background: transparent;
