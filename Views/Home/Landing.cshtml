@@ -8,9 +8,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HealthcareCRM</title>
+    <title>HealthcareCRM — Modern Clinic Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/css/site.css" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 </head>
 <body>
 
@@ -24,6 +26,8 @@
         Healthcare<span>CRM</span>
     </div>
     <div class="nav-links">
+        <a href="#features" class="btn-login">Features</a>
+        <a href="#why" class="btn-login">Why Us</a>
         <a href="/Account/Login" class="btn-login">Login</a>
         <a href="/Account/Register" class="btn-start">Get Started →</a>
     </div>
@@ -43,22 +47,15 @@
                 </filter>
             </defs>
             <path id="hero-pulse-path"
-                  d="M0,110 L900,110 L920,110 L940,25 L960,195 L980,60 L1000,110 L1200,110" />
+                  d="M0,110 L900,110 L910,110 L915,95 L925,110 L940,110 L940,25 L960,195 L980,60 L1000,110 L1010,110 L1020,140 L1035,140 L1050,110 L1200,110" />
             <circle id="hero-dot" r="5" fill="#00ff88" filter="url(#glow-filter)">
                 <animateMotion dur="3.2s" repeatCount="indefinite"
-                                path="M0,110 L900,110 L920,110 L940,25 L960,195 L980,60 L1000,110 L1200,110" />
+                    path="M0,110 L900,110 L910,110 L915,95 L925,110 L940,110 L940,25 L960,195 L980,60 L1000,110 L1010,110 L1020,140 L1035,140 L1050,110 L1200,110" />
             </circle>
         </svg>
     </div>
 
     <div class="hero-content">
-        <div class="tag">
-            <svg class="heartbeat-icon" viewBox="0 0 48 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0,12 L10,12 L14,3 L18,21 L22,12 L26,12 L30,18 L34,6 L38,12 L48,12"
-                      fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            Healthcare Management System
-        </div>
         <h1>
             Manage Your<br>
             Clinic With<br>
@@ -69,8 +66,8 @@
             Patients, doctors, appointments — all in one place.
         </p>
         <div class="hero-actions">
-            <a href="/Account/Register" class="btn-primary-custom">Start for Free →</a>
-            <a href="/Account/Login" class="btn-secondary-custom">Sign In</a>
+            <a href="/Account/Register" class="btn-primary-custom">Get Started Free →</a>
+            <a href="#features" class="btn-secondary-custom">See Features</a>
         </div>
         <div class="live-status">
             <span class="status-dot-wrap">
@@ -82,32 +79,32 @@
     </div>
 </section>
 
-<!-- Stats -->
+<!-- Animated Stats -->
 <div class="stats-bar">
     <div class="container">
         <div class="row g-4">
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Patients Managed</div>
+                    <div class="stats-bar stat-number" data-target="500">0</div>
+                    <div class="stats-bar stat-label">Patients Registered</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">Doctors Onboarded</div>
+                    <div class="stats-bar stat-number" data-target="50">0</div>
+                    <div class="stats-bar stat-label">Doctors Onboarded</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <div class="stat-number">1200+</div>
-                    <div class="stat-label">Appointments Booked</div>
+                    <div class="stats-bar stat-number" data-target="1200">0</div>
+                    <div class="stats-bar stat-label">Appointments Scheduled</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
                 <div class="stat-item">
-                    <div class="stat-number">99%</div>
-                    <div class="stat-label">Uptime Guaranteed</div>
+                    <div class="stats-bar stat-number" data-target="99">0</div>
+                    <div class="stats-bar stat-label">Uptime Guaranteed</div>
                 </div>
             </div>
         </div>
@@ -115,48 +112,108 @@
 </div>
 
 <!-- Features -->
-<section class="features">
+
+<section class="features" id="features">
     <div class="container">
         <div class="section-label">Features</div>
         <h2 class="section-title">Built for real<br>clinical workflows.</h2>
         <p class="section-subtitle">Everything a modern healthcare facility needs — nothing it doesn't.</p>
-
         <div class="feature-grid">
             <div class="feature-item">
                 <div class="feature-number">01</div>
-                <div class="feature-icon-box">👥</div>
-                <div class="feature-title">Patient Management</div>
-                <div class="feature-desc">Full CRUD with search by name, phone, or date of birth. Paginated list with detail view.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-person-vcard" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Patient Records</div>
+                <div class="feature-desc">Maintain complete patient profiles — contact info, date of birth, gender, and medical history. Search instantly by name or phone.</div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">02</div>
-                <div class="feature-icon-box">👨‍⚕️</div>
-                <div class="feature-title">Doctor Scheduling</div>
-                <div class="feature-desc">Add, edit, and manage doctors. Soft deactivate without losing historical records.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-hospital" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Doctor Management</div>
+                <div class="feature-desc">Onboard specialists, assign departments, and manage availability. Historical records are preserved when doctors go inactive.</div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">03</div>
-                <div class="feature-icon-box">📅</div>
-                <div class="feature-title">Appointment Booking</div>
-                <div class="feature-desc">Book appointments in seconds. Filter by status — Pending, Confirmed, or Cancelled.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-calendar2-check" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Appointment Scheduling</div>
+                <div class="feature-desc">Book, confirm, and cancel appointments in seconds. Filter by status and generate PDF reports for any date range.</div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">04</div>
-                <div class="feature-icon-box">🔒</div>
-                <div class="feature-title">Secure Auth</div>
-                <div class="feature-desc">JWT authentication with protected routes. localStorage token management.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-shield-plus" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Staff Access Control</div>
+                <div class="feature-desc">Separate roles for Admin and Staff. Receptionists manage bookings, admins control records and exports. Every action is logged.</div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">05</div>
-                <div class="feature-icon-box">📖</div>
-                <div class="feature-title">Swagger Docs</div>
-                <div class="feature-desc">Every endpoint documented and testable from the browser at /swagger.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-graph-up-arrow" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Clinic Dashboard</div>
+                <div class="feature-desc">See today's appointments, pending confirmations, and total patient count — all at a glance on one screen.</div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">06</div>
-                <div class="feature-icon-box">🛡️</div>
-                <div class="feature-title">Data Integrity</div>
-                <div class="feature-desc">Server-side validation on all endpoints. CodeRabbit reviewed for XSS and security.</div>
+                <div class="feature-icon-box">
+                    <i class="bi bi-file-earmark-arrow-down" style="font-size:1.3rem; color:#00ff88;"></i>
+                </div>
+                <div class="feature-title">Reports & Exports</div>
+                <div class="feature-desc">Export patient lists to CSV and appointment summaries to PDF. Share reports with management or keep for clinic records.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+
+<section class="why-section" id="why">
+    <div class="container">
+        <div class="section-label">Why HealthcareCRM</div>
+        <h2 class="section-title">Why clinics choose us.</h2>
+        <p class="section-subtitle">Built with real healthcare workflows in mind — not generic software adapted for clinics.</p>
+        <div class="row g-4 mt-4">
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-number">01</div>
+                    <div class="why-content">
+                        <h5 class="why-title">Everything in One Place</h5>
+                        <p class="why-desc">Patient records, doctor schedules, and appointments — managed from a single screen. No paper files, no scattered spreadsheets.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-number">02</div>
+                    <div class="why-content">
+                        <h5 class="why-title">Built for Your Whole Team</h5>
+                        <p class="why-desc">Receptionists book appointments, doctors view schedules, and admins manage everything — each with the right level of access.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-number">03</div>
+                    <div class="why-content">
+                        <h5 class="why-title">Instant Reports</h5>
+                        <p class="why-desc">Generate patient export files and appointment reports in one click. Share with management or keep for clinic audits.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="why-card">
+                    <div class="why-number">04</div>
+                    <div class="why-content">
+                        <h5 class="why-title">Secure Patient Data</h5>
+                        <p class="why-desc">Every login is verified, every action is logged. Patient data stays protected with role-based access and full audit trail.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -169,18 +226,65 @@
               d="M0,20 L170,20 L190,20 L206,4 L218,36 L230,10 L242,20 L460,20" />
     </svg>
     <h2>Ready to get<br><span>started?</span></h2>
-    <p>Join HealthcareCRM and modernize your clinic today.</p>
-    <a href="/Account/Register" class="btn-primary-custom">Create Account →</a>
+    <p>Join HealthcareCRM and modernize your clinic operations today.</p>
+    <a href="/Account/Register" class="btn-primary-custom">Create Free Account →</a>
 </section>
 
 <!-- Footer -->
-<footer>
-    <div>© 2026 HealthcareCRM</div>
-    <div>Built by Sohaib — Friendsware Solutions Internship 2026</div>
+<footer class="landing-footer">
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="footer-logo">
+                    <svg width="20" height="12" viewBox="0 0 48 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,12 L10,12 L14,3 L18,21 L22,12 L26,12 L30,18 L34,6 L38,12 L48,12"
+                              fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Healthcare<span>CRM</span>
+                </div>
+                <p class="footer-desc">A modern clinic management system built for healthcare professionals.</p>
+            </div>
+            <div class="col-md-2">
+                <div class="footer-heading">Features</div>
+                <ul class="footer-links">
+                    <li><a href="#features">Patients</a></li>
+                    <li><a href="#features">Doctors</a></li>
+                    <li><a href="#features">Appointments</a></li>
+                    <li><a href="#features">Analytics</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <div class="footer-heading">System</div>
+                <ul class="footer-links">
+                    <li><a href="/swagger" target="_blank">API Docs</a></li>
+                    <li><a href="/Account/Login">Login</a></li>
+                    <li><a href="/Account/Register">Register</a></li>
+                    <li><a href="/api/health">Health Check</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <div class="footer-heading">About</div>
+                <p class="footer-desc">Built by <strong style="color:white;">Muhammad Sohaib</strong> as part of Friendsware Solutions Summer Internship 2026.</p>
+                <a href="https://github.com/Sohaibkundi2/HealthcareCRM" 
+                   target="_blank" class="footer-github">
+                    <i class="bi bi-github me-1"></i>View on GitHub
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 HealthcareCRM. All rights reserved.</span>
+            <span>Islamabad, Pakistan</span>
+        </div>
+    </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Redirect if already logged in
+    const token = localStorage.getItem('jwt');
+    if (token) window.location.href = '/Home/Index';
+
+    // Heartbeat animation
     (function () {
         function drawOnLoad(path) {
             if (!path) return;
@@ -213,6 +317,38 @@
             observer.observe(ctaPath);
         }
     })();
+
+    // Animated stats counter
+    function animateCounter(el, target, suffix) {
+        var start = 0;
+        var duration = 2000;
+        var step = target / (duration / 16);
+        var timer = setInterval(function () {
+            start += step;
+            if (start >= target) {
+                start = target;
+                clearInterval(timer);
+            }
+            el.textContent = Math.floor(start) + (suffix || '');
+        }, 16);
+    }
+
+    var statsObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                var els = document.querySelectorAll('[data-target]');
+                els.forEach(function (el) {
+                    var target = parseInt(el.dataset.target);
+                    var suffix = el.dataset.suffix || '';
+                    animateCounter(el, target, suffix);
+                });
+                statsObserver.disconnect();
+            }
+        });
+    }, { threshold: 0.3 });
+
+    var statsBar = document.querySelector('.stats-bar');
+    if (statsBar) statsObserver.observe(statsBar);
 </script>
 
 </body>
