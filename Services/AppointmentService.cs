@@ -35,7 +35,8 @@ namespace HealthcareCRM.Services
                 query = query.Where(a => a.Status == status);
 
             return await query
-                .OrderByDescending(a => a.AppointmentDate)
+                .OrderByDescending(a => a.CreatedAt)
+                .ThenByDescending(a => a.AppointmentDate)
                 .ToListAsync();
         }
 
